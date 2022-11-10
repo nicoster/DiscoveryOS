@@ -1,0 +1,692 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		101E9432290E338400F92620 /* DiscoveryOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 101E9431290E338400F92620 /* DiscoveryOSApp.swift */; };
+		101E9434290E338400F92620 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 101E9433290E338400F92620 /* MainView.swift */; };
+		101E9436290E338400F92620 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 101E9435290E338400F92620 /* Assets.xcassets */; };
+		101E9439290E338400F92620 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 101E9438290E338400F92620 /* Preview Assets.xcassets */; };
+		101E9444290E338500F92620 /* DiscoveryOSTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 101E9443290E338500F92620 /* DiscoveryOSTests.swift */; };
+		101E944E290E338500F92620 /* DiscoveryOSUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 101E944D290E338500F92620 /* DiscoveryOSUITests.swift */; };
+		101E9450290E338500F92620 /* DiscoveryOSUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 101E944F290E338500F92620 /* DiscoveryOSUITestsLaunchTests.swift */; };
+		101E945D290F7D1300F92620 /* DiscuzAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 101E945C290F7D1300F92620 /* DiscuzAPI.swift */; };
+		101E946029109C5200F92620 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 101E945F29109C5200F92620 /* Kingfisher */; };
+		10339C6F291696E20092CFEA /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = 10339C6E291696E20092CFEA /* MarkdownUI */; };
+		104BA599291A933300E14756 /* CurrentUserStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 104BA598291A933300E14756 /* CurrentUserStore.swift */; };
+		104BA59C291A953F00E14756 /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = 104BA59B291A953F00E14756 /* KeychainAccess */; };
+		108A6F3129123E940014DB4E /* ChannelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108A6F3029123E940014DB4E /* ChannelView.swift */; };
+		108A6F3329123EC50014DB4E /* PostListCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108A6F3229123EC50014DB4E /* PostListCellView.swift */; };
+		108A6F3529123EF50014DB4E /* PostDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108A6F3429123EF50014DB4E /* PostDetailView.swift */; };
+		108A6F3729123F210014DB4E /* ReplyCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108A6F3629123F210014DB4E /* ReplyCellView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		101E9440290E338500F92620 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 101E9426290E338400F92620 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 101E942D290E338400F92620;
+			remoteInfo = DiscoveryOS;
+		};
+		101E944A290E338500F92620 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 101E9426290E338400F92620 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 101E942D290E338400F92620;
+			remoteInfo = DiscoveryOS;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		101E942E290E338400F92620 /* DiscoveryOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DiscoveryOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		101E9431290E338400F92620 /* DiscoveryOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoveryOSApp.swift; sourceTree = "<group>"; };
+		101E9433290E338400F92620 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
+		101E9435290E338400F92620 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		101E9438290E338400F92620 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		101E943A290E338400F92620 /* DiscoveryOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DiscoveryOS.entitlements; sourceTree = "<group>"; };
+		101E943F290E338500F92620 /* DiscoveryOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DiscoveryOSTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		101E9443290E338500F92620 /* DiscoveryOSTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoveryOSTests.swift; sourceTree = "<group>"; };
+		101E9449290E338500F92620 /* DiscoveryOSUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DiscoveryOSUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		101E944D290E338500F92620 /* DiscoveryOSUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoveryOSUITests.swift; sourceTree = "<group>"; };
+		101E944F290E338500F92620 /* DiscoveryOSUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoveryOSUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		101E945C290F7D1300F92620 /* DiscuzAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscuzAPI.swift; sourceTree = "<group>"; };
+		104BA598291A933300E14756 /* CurrentUserStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CurrentUserStore.swift; sourceTree = "<group>"; };
+		108A6F3029123E940014DB4E /* ChannelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelView.swift; sourceTree = "<group>"; };
+		108A6F3229123EC50014DB4E /* PostListCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostListCellView.swift; sourceTree = "<group>"; };
+		108A6F3429123EF50014DB4E /* PostDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostDetailView.swift; sourceTree = "<group>"; };
+		108A6F3629123F210014DB4E /* ReplyCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReplyCellView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		101E942B290E338400F92620 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				101E946029109C5200F92620 /* Kingfisher in Frameworks */,
+				10339C6F291696E20092CFEA /* MarkdownUI in Frameworks */,
+				104BA59C291A953F00E14756 /* KeychainAccess in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		101E943C290E338500F92620 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		101E9446290E338500F92620 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		101E9425290E338400F92620 = {
+			isa = PBXGroup;
+			children = (
+				105A94872913FE4A001B9A62 /* Packages */,
+				101E9430290E338400F92620 /* DiscoveryOS */,
+				101E9442290E338500F92620 /* DiscoveryOSTests */,
+				101E944C290E338500F92620 /* DiscoveryOSUITests */,
+				101E942F290E338400F92620 /* Products */,
+				1085E8C7291CD49700CEC4B5 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		101E942F290E338400F92620 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				101E942E290E338400F92620 /* DiscoveryOS.app */,
+				101E943F290E338500F92620 /* DiscoveryOSTests.xctest */,
+				101E9449290E338500F92620 /* DiscoveryOSUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		101E9430290E338400F92620 /* DiscoveryOS */ = {
+			isa = PBXGroup;
+			children = (
+				101E9431290E338400F92620 /* DiscoveryOSApp.swift */,
+				108A6F2F29123E700014DB4E /* Views */,
+				101E9435290E338400F92620 /* Assets.xcassets */,
+				101E943A290E338400F92620 /* DiscoveryOS.entitlements */,
+				101E9437290E338400F92620 /* Preview Content */,
+				101E945C290F7D1300F92620 /* DiscuzAPI.swift */,
+				104BA598291A933300E14756 /* CurrentUserStore.swift */,
+			);
+			path = DiscoveryOS;
+			sourceTree = "<group>";
+		};
+		101E9437290E338400F92620 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				101E9438290E338400F92620 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		101E9442290E338500F92620 /* DiscoveryOSTests */ = {
+			isa = PBXGroup;
+			children = (
+				101E9443290E338500F92620 /* DiscoveryOSTests.swift */,
+			);
+			path = DiscoveryOSTests;
+			sourceTree = "<group>";
+		};
+		101E944C290E338500F92620 /* DiscoveryOSUITests */ = {
+			isa = PBXGroup;
+			children = (
+				101E944D290E338500F92620 /* DiscoveryOSUITests.swift */,
+				101E944F290E338500F92620 /* DiscoveryOSUITestsLaunchTests.swift */,
+			);
+			path = DiscoveryOSUITests;
+			sourceTree = "<group>";
+		};
+		105A94872913FE4A001B9A62 /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Packages;
+			sourceTree = "<group>";
+		};
+		1085E8C7291CD49700CEC4B5 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		108A6F2F29123E700014DB4E /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				101E9433290E338400F92620 /* MainView.swift */,
+				108A6F3029123E940014DB4E /* ChannelView.swift */,
+				108A6F3229123EC50014DB4E /* PostListCellView.swift */,
+				108A6F3429123EF50014DB4E /* PostDetailView.swift */,
+				108A6F3629123F210014DB4E /* ReplyCellView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		101E942D290E338400F92620 /* DiscoveryOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 101E9453290E338500F92620 /* Build configuration list for PBXNativeTarget "DiscoveryOS" */;
+			buildPhases = (
+				101E942A290E338400F92620 /* Sources */,
+				101E942B290E338400F92620 /* Frameworks */,
+				101E942C290E338400F92620 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = DiscoveryOS;
+			packageProductDependencies = (
+				101E945F29109C5200F92620 /* Kingfisher */,
+				10339C6E291696E20092CFEA /* MarkdownUI */,
+				104BA59B291A953F00E14756 /* KeychainAccess */,
+			);
+			productName = DiscoveryOS;
+			productReference = 101E942E290E338400F92620 /* DiscoveryOS.app */;
+			productType = "com.apple.product-type.application";
+		};
+		101E943E290E338500F92620 /* DiscoveryOSTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 101E9456290E338500F92620 /* Build configuration list for PBXNativeTarget "DiscoveryOSTests" */;
+			buildPhases = (
+				101E943B290E338500F92620 /* Sources */,
+				101E943C290E338500F92620 /* Frameworks */,
+				101E943D290E338500F92620 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				101E9441290E338500F92620 /* PBXTargetDependency */,
+			);
+			name = DiscoveryOSTests;
+			productName = DiscoveryOSTests;
+			productReference = 101E943F290E338500F92620 /* DiscoveryOSTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		101E9448290E338500F92620 /* DiscoveryOSUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 101E9459290E338500F92620 /* Build configuration list for PBXNativeTarget "DiscoveryOSUITests" */;
+			buildPhases = (
+				101E9445290E338500F92620 /* Sources */,
+				101E9446290E338500F92620 /* Frameworks */,
+				101E9447290E338500F92620 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				101E944B290E338500F92620 /* PBXTargetDependency */,
+			);
+			name = DiscoveryOSUITests;
+			productName = DiscoveryOSUITests;
+			productReference = 101E9449290E338500F92620 /* DiscoveryOSUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		101E9426290E338400F92620 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1400;
+				LastUpgradeCheck = 1400;
+				TargetAttributes = {
+					101E942D290E338400F92620 = {
+						CreatedOnToolsVersion = 14.0.1;
+					};
+					101E943E290E338500F92620 = {
+						CreatedOnToolsVersion = 14.0.1;
+						TestTargetID = 101E942D290E338400F92620;
+					};
+					101E9448290E338500F92620 = {
+						CreatedOnToolsVersion = 14.0.1;
+						TestTargetID = 101E942D290E338400F92620;
+					};
+				};
+			};
+			buildConfigurationList = 101E9429290E338400F92620 /* Build configuration list for PBXProject "DiscoveryOS" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 101E9425290E338400F92620;
+			packageReferences = (
+				101E945E29109C5200F92620 /* XCRemoteSwiftPackageReference "Kingfisher" */,
+				10339C6D291696E20092CFEA /* XCRemoteSwiftPackageReference "MarkdownUI" */,
+				104BA59A291A953F00E14756 /* XCRemoteSwiftPackageReference "KeychainAccess" */,
+			);
+			productRefGroup = 101E942F290E338400F92620 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				101E942D290E338400F92620 /* DiscoveryOS */,
+				101E943E290E338500F92620 /* DiscoveryOSTests */,
+				101E9448290E338500F92620 /* DiscoveryOSUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		101E942C290E338400F92620 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				101E9439290E338400F92620 /* Preview Assets.xcassets in Resources */,
+				101E9436290E338400F92620 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		101E943D290E338500F92620 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		101E9447290E338500F92620 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		101E942A290E338400F92620 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				104BA599291A933300E14756 /* CurrentUserStore.swift in Sources */,
+				108A6F3129123E940014DB4E /* ChannelView.swift in Sources */,
+				108A6F3329123EC50014DB4E /* PostListCellView.swift in Sources */,
+				108A6F3729123F210014DB4E /* ReplyCellView.swift in Sources */,
+				101E9434290E338400F92620 /* MainView.swift in Sources */,
+				108A6F3529123EF50014DB4E /* PostDetailView.swift in Sources */,
+				101E9432290E338400F92620 /* DiscoveryOSApp.swift in Sources */,
+				101E945D290F7D1300F92620 /* DiscuzAPI.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		101E943B290E338500F92620 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				101E9444290E338500F92620 /* DiscoveryOSTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		101E9445290E338500F92620 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				101E944E290E338500F92620 /* DiscoveryOSUITests.swift in Sources */,
+				101E9450290E338500F92620 /* DiscoveryOSUITestsLaunchTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		101E9441290E338500F92620 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 101E942D290E338400F92620 /* DiscoveryOS */;
+			targetProxy = 101E9440290E338500F92620 /* PBXContainerItemProxy */;
+		};
+		101E944B290E338500F92620 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 101E942D290E338400F92620 /* DiscoveryOS */;
+			targetProxy = 101E944A290E338500F92620 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		101E9451290E338500F92620 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 12.3;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		101E9452290E338500F92620 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 12.3;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+			};
+			name = Release;
+		};
+		101E9454290E338500F92620 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
+				CODE_SIGN_ENTITLEMENTS = DiscoveryOS/DiscoveryOS.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"DiscoveryOS/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.nickr.DiscoveryOS;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		101E9455290E338500F92620 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
+				CODE_SIGN_ENTITLEMENTS = DiscoveryOS/DiscoveryOS.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"DiscoveryOS/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.nickr.DiscoveryOS;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		101E9457290E338500F92620 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 12.3;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.nickr.DiscoveryOSTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DiscoveryOS.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/DiscoveryOS";
+			};
+			name = Debug;
+		};
+		101E9458290E338500F92620 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 12.3;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.nickr.DiscoveryOSTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DiscoveryOS.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/DiscoveryOS";
+			};
+			name = Release;
+		};
+		101E945A290E338500F92620 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.nickr.DiscoveryOSUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = DiscoveryOS;
+			};
+			name = Debug;
+		};
+		101E945B290E338500F92620 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.nickr.DiscoveryOSUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = DiscoveryOS;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		101E9429290E338400F92620 /* Build configuration list for PBXProject "DiscoveryOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				101E9451290E338500F92620 /* Debug */,
+				101E9452290E338500F92620 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		101E9453290E338500F92620 /* Build configuration list for PBXNativeTarget "DiscoveryOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				101E9454290E338500F92620 /* Debug */,
+				101E9455290E338500F92620 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		101E9456290E338500F92620 /* Build configuration list for PBXNativeTarget "DiscoveryOSTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				101E9457290E338500F92620 /* Debug */,
+				101E9458290E338500F92620 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		101E9459290E338500F92620 /* Build configuration list for PBXNativeTarget "DiscoveryOSUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				101E945A290E338500F92620 /* Debug */,
+				101E945B290E338500F92620 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		101E945E29109C5200F92620 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/onevcat/Kingfisher";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 7.0.0;
+			};
+		};
+		10339C6D291696E20092CFEA /* XCRemoteSwiftPackageReference "MarkdownUI" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/gonzalezreal/MarkdownUI";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
+		104BA59A291A953F00E14756 /* XCRemoteSwiftPackageReference "KeychainAccess" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kishikawakatsumi/KeychainAccess";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		101E945F29109C5200F92620 /* Kingfisher */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 101E945E29109C5200F92620 /* XCRemoteSwiftPackageReference "Kingfisher" */;
+			productName = Kingfisher;
+		};
+		10339C6E291696E20092CFEA /* MarkdownUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 10339C6D291696E20092CFEA /* XCRemoteSwiftPackageReference "MarkdownUI" */;
+			productName = MarkdownUI;
+		};
+		104BA59B291A953F00E14756 /* KeychainAccess */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 104BA59A291A953F00E14756 /* XCRemoteSwiftPackageReference "KeychainAccess" */;
+			productName = KeychainAccess;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 101E9426290E338400F92620 /* Project object */;
+}
