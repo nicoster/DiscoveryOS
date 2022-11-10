@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		100FF467291D40B400CF6F01 /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = 100FF466291D40B400CF6F01 /* MarkdownUI */; };
 		101E9432290E338400F92620 /* DiscoveryOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 101E9431290E338400F92620 /* DiscoveryOSApp.swift */; };
 		101E9434290E338400F92620 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 101E9433290E338400F92620 /* MainView.swift */; };
 		101E9436290E338400F92620 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 101E9435290E338400F92620 /* Assets.xcassets */; };
@@ -16,7 +17,6 @@
 		101E9450290E338500F92620 /* DiscoveryOSUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 101E944F290E338500F92620 /* DiscoveryOSUITestsLaunchTests.swift */; };
 		101E945D290F7D1300F92620 /* DiscuzAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 101E945C290F7D1300F92620 /* DiscuzAPI.swift */; };
 		101E946029109C5200F92620 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 101E945F29109C5200F92620 /* Kingfisher */; };
-		10339C6F291696E20092CFEA /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = 10339C6E291696E20092CFEA /* MarkdownUI */; };
 		104BA599291A933300E14756 /* CurrentUserStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 104BA598291A933300E14756 /* CurrentUserStore.swift */; };
 		104BA59C291A953F00E14756 /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = 104BA59B291A953F00E14756 /* KeychainAccess */; };
 		108A6F3129123E940014DB4E /* ChannelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108A6F3029123E940014DB4E /* ChannelView.swift */; };
@@ -67,8 +67,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				100FF467291D40B400CF6F01 /* MarkdownUI in Frameworks */,
 				101E946029109C5200F92620 /* Kingfisher in Frameworks */,
-				10339C6F291696E20092CFEA /* MarkdownUI in Frameworks */,
 				104BA59C291A953F00E14756 /* KeychainAccess in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -195,8 +195,8 @@
 			name = DiscoveryOS;
 			packageProductDependencies = (
 				101E945F29109C5200F92620 /* Kingfisher */,
-				10339C6E291696E20092CFEA /* MarkdownUI */,
 				104BA59B291A953F00E14756 /* KeychainAccess */,
+				100FF466291D40B400CF6F01 /* MarkdownUI */,
 			);
 			productName = DiscoveryOS;
 			productReference = 101E942E290E338400F92620 /* DiscoveryOS.app */;
@@ -272,8 +272,8 @@
 			mainGroup = 101E9425290E338400F92620;
 			packageReferences = (
 				101E945E29109C5200F92620 /* XCRemoteSwiftPackageReference "Kingfisher" */,
-				10339C6D291696E20092CFEA /* XCRemoteSwiftPackageReference "MarkdownUI" */,
 				104BA59A291A953F00E14756 /* XCRemoteSwiftPackageReference "KeychainAccess" */,
+				100FF465291D40B400CF6F01 /* XCRemoteSwiftPackageReference "MarkdownUI" */,
 			);
 			productRefGroup = 101E942F290E338400F92620 /* Products */;
 			projectDirPath = "";
@@ -644,20 +644,20 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		100FF465291D40B400CF6F01 /* XCRemoteSwiftPackageReference "MarkdownUI" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/nicoster/MarkdownUI";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 		101E945E29109C5200F92620 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/onevcat/Kingfisher";
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 7.0.0;
-			};
-		};
-		10339C6D291696E20092CFEA /* XCRemoteSwiftPackageReference "MarkdownUI" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/gonzalezreal/MarkdownUI";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.0;
 			};
 		};
 		104BA59A291A953F00E14756 /* XCRemoteSwiftPackageReference "KeychainAccess" */ = {
@@ -671,15 +671,15 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		100FF466291D40B400CF6F01 /* MarkdownUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 100FF465291D40B400CF6F01 /* XCRemoteSwiftPackageReference "MarkdownUI" */;
+			productName = MarkdownUI;
+		};
 		101E945F29109C5200F92620 /* Kingfisher */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 101E945E29109C5200F92620 /* XCRemoteSwiftPackageReference "Kingfisher" */;
 			productName = Kingfisher;
-		};
-		10339C6E291696E20092CFEA /* MarkdownUI */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 10339C6D291696E20092CFEA /* XCRemoteSwiftPackageReference "MarkdownUI" */;
-			productName = MarkdownUI;
 		};
 		104BA59B291A953F00E14756 /* KeychainAccess */ = {
 			isa = XCSwiftPackageProductDependency;
