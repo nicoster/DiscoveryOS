@@ -41,6 +41,10 @@ public struct Channel : Identifiable {
 	public let newPosts : Int?
 }
 
+extension String.Encoding {
+	static let gb_18030_2000 = String.Encoding(rawValue: CFStringConvertEncodingToNSStringEncoding(CFStringEncoding(CFStringEncodings.GB_18030_2000.rawValue)))
+}
+
 extension String {
 	var htmlDecoded: String {
 		let decoded = try? NSAttributedString(data: Data(utf8), options: [
@@ -51,20 +55,67 @@ extension String {
 		return decoded ?? self
 	}
 	
-	func urlencoded() -> String? {
-		let unreserved = "-._~/?"
-		let allowed = NSMutableCharacterSet.alphanumeric()
-		allowed.addCharacters(in: unreserved)
-		return addingPercentEncoding(withAllowedCharacters: allowed as CharacterSet)
+//	func urlencode() -> String? {
+//		let unreserved = "-._~/?"
+//		let allowed = NSMutableCharacterSet.alphanumeric()
+//		allowed.addCharacters(in: unreserved)
+//		return addingPercentEncoding(withAllowedCharacters: allowed as CharacterSet)
+//
+//	}
+	
+	func urlencode(using encoding: String.Encoding = .gb_18030_2000) -> String? {
+		var res = ""
+		let src = self.replacingOccurrences(of: " ", with: "+")
+		if let data = src.data(using: encoding) {
+			res = data.reduce(into:res) {
+				let scalar = UnicodeScalar($1)
+				if $1 <= 127, CharacterSet.urlQueryAllowed.contains(scalar) {
+					$0 += String(Character(scalar))
+				} else {
+					$0 += "%" + String($1, radix:16, uppercase: true)
+				}
+			}
+		}
+		
+		return res.isEmpty ? self : res
 	}
 	
 	func replace(pattern : String, with template: String, options : NSRegularExpression.Options = .dotMatchesLineSeparators) -> String {
 		let re = try! NSRegularExpression(pattern: pattern, options: options)
 		return re.stringByReplacingMatches(in: self, options: [], range: NSRange(0..<self.utf16.count), withTemplate: template)
 	}
+	
+	func bytesByRemovingPercentEncoding(using encoding: String.Encoding) -> Data {
+		struct My {
+			static let regex = try! NSRegularExpression(pattern: "(%[0-9A-F]{2})|(.)", options: .caseInsensitive)
+		}
+		var bytes = Data()
+		let nsSelf = self as NSString
+		for match in My.regex.matches(in: self, range: NSRange(0..<self.utf16.count)) {
+			if match.range(at: 1).location != NSNotFound {
+				let hexString = nsSelf.substring(with: NSMakeRange(match.range(at: 1).location+1, 2))
+				bytes.append(UInt8(hexString, radix: 16)!)
+			} else {
+				let singleChar = nsSelf.substring(with: match.range(at: 2))
+				bytes.append(singleChar.data(using: encoding) ?? "?".data(using: .ascii)!)
+			}
+		}
+		return bytes
+	}
+	func removingPercentEncoding(using encoding: String.Encoding) -> String? {
+		return String(data: bytesByRemovingPercentEncoding(using: encoding), encoding: encoding)
+	}
 }
 
+var sharedFormHash : String? = nil
+
 public struct DiscuzAPI {
+	
+	let debug_loadreplies = false
+	let debug_markdown = false
+	let debug_misc = false
+	let debug_cookies = false
+	let debug_traffic = false
 	
 	let host = "https://www.4d4y.com/forum/"
 	let loginRequired = "<select name=\"loginfield\" id=\"loginfield\">"
@@ -86,6 +137,7 @@ public struct DiscuzAPI {
 		// relative paths are handled by MarkdownUI (using baseURL)
 		
 		result = [
+			("<a href=\"javascript:;\"><img onclick=\"zoom\\(this, '([^']+)'.*?</a>", "![]($1)"),
 			("<a\\s+href=\"([^\"]+)\".*?>(.*?)</a>", "[$2]($1)"),
 			// 2 passes to handle 1 image has both `src` and `file` attributes
 			("<img\\s+[^<>]*?(?:file|src)=\"([^\"]+)\"", "\n<br/>![$2]($1)\n<img"),
@@ -94,6 +146,10 @@ public struct DiscuzAPI {
 			("([^>]+发表于.*?)</blockquote>", "```<br/>\n$1")
 		].reduce(result) {
 			$0.replace(pattern: $1.0, with: $1.1)
+		}
+		
+		if debug_markdown {
+			print("result:\(result)")
 		}
 		
 		if let attributed = try? NSAttributedString(data: result.data(using: .unicode)!, options: [.documentType: NSAttributedString.DocumentType.html], documentAttributes: nil) {
@@ -145,84 +201,122 @@ public struct DiscuzAPI {
 	}
 	
 	
-	public let GB_18030_2000 = String.Encoding(rawValue: CFStringConvertEncodingToNSStringEncoding(CFStringEncoding(CFStringEncodings.GB_18030_2000.rawValue)))
 	
-	
-	func request(method: String = "GET", url: String, args: [String: Any]? = nil, retry : Bool = true) async throws -> String? {
+	func request2(method: String = "GET", url: String, args: [(String, Any)]? = nil,
+				  moreheaders: [String: String]? = nil, retry : Bool = true) async throws -> (text: String?, resp: URLResponse?) {
 		let urlComponents = NSURLComponents(string: url)!
 		
 		if method != "POST" && args != nil {
 			urlComponents.queryItems =
-			args?.map({ (k, v) in
-				return NSURLQueryItem(name: k, value: "\(v)")
-			}) as [URLQueryItem]?
+			args?.map({ NSURLQueryItem(name: $0, value: "\($1)") }) as [URLQueryItem]?
 		}
 		
 		guard let requestUrl = urlComponents.url else {
-			return nil
+			return (nil, nil)
 		}
 		
 		var request = URLRequest(url: requestUrl)
 		request.httpMethod = method
 		
-		let headers = [
+		var headers = [
 			"Content-Type": "application/x-www-form-urlencoded",
 			"Accept-Encoding": "gzip, deflate, br",
 			"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
 			"Connection": "keep-alive",
+			"Referer": "https://www.4d4y.com/forum/viewthread.php?tid=3110774&pid=65984949&page=1&extra=page%3D1",
+			"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.1 Safari/605.1.15",
+			"Origin": "https://www.4d4y.com",
 		]
+		if let moreheaders {
+			headers = headers.merging(moreheaders){$1}
+		}
+		
 		headers.forEach { field, value in request.addValue(value, forHTTPHeaderField: field) }
 		
 		if method == "POST" && args != nil{
 			//    request.httpBody = try? JSONSerialization.data(withJSONObject: args as Any)
-			request.httpBody = args?.map { "\($0)=\($1)" }.joined(separator: "&").data(using: .utf8)
+			let body = args?.map { "\($0)=\($1)" }.joined(separator: "&")
+			if debug_traffic {
+				print("httpbody:\(body!)")
+			}
+			request.httpBody = body?.data(using: .utf8)
 		}
 		
-		let (data, _) = try await session.data(for: request)
-		let text = String(data: data, encoding: GB_18030_2000)
-		print("data: \(data)")
+		let (data, resp) = try await session.data(for: request)
+		let text = String(data: data, encoding: .gb_18030_2000)
+		if debug_traffic {
+			print("data: \(data)")
+		}
 		
+		if let text {
+			let formhash = capturedGroups(regex: #"<a href="logging.php\?action=logout&amp;formhash=([^"]+)">退出</a>"#, text: text, skipFirst: true)
+			if formhash.count > 0 {
+				sharedFormHash = formhash[0]
+			}
+			if debug_misc {
+				print("formhash: \(formhash)")
+			}
+		}
+		
+		if debug_cookies {
+			let cookieStore = HTTPCookieStorage.shared
+			for cookie in cookieStore.cookies ?? [] {
+				print("cookie:\(cookie)")
+			}
+		}
+
 		if retry, let text, text.contains(loginRequired), let user, let pass {
-			print("_/\\_/\\_/\\_/\\_/\\_/\\_/\\_/\\_/\\_/\\_/\\_ re-login for \(url)")
+			print("re-login for \(url)")
 			let _ = await dologin(name:user, pass:pass)
-			return try await self.request(method: method, url: url, args:args, retry:false)
+			return try await self.request2(method: method, url: url, args:args, retry:false)
 		}
-		return text
+		return (text, resp)
 		
+	}
+	
+	func request(method: String = "GET", url: String, args: [(String, Any)]? = nil, retry : Bool = true) async throws -> String? {
+		let (text, _) = try await request2(method: method, url: url, args: args, retry: retry)
+		return text
 	}
 	
 	public mutating func login(name : String, pass : String) async -> Bool {
-		let okay = await dologin(name: name, pass: pass)
-		if okay {
+		let formhash = await dologin(name: name, pass: pass)
+		if formhash != nil {
 			self.user = name
 			self.pass = pass
+			return true
 		}
 		
-		return okay
+		return false
 	}
 	
-	private func dologin(name : String, pass : String) async -> Bool {
+	private func dologin(name : String, pass : String) async -> String? {
 		print("login \(name) ")
-		let text = try? await request(method: "POST", url: host + "logging.php?action=login&loginsubmit=yes", args:[
-			"username": name,
-			"password": pass,
-			"loginsubmit": "true"
+		let html = try? await request(method: "POST", url: host + "logging.php?action=login&loginsubmit=yes", args:[
+			("username", name),
+			("password", pass),
+			("loginsubmit", "true")
 		], retry: false)
 		
-		//		print("login: \(String(describing: text))")
-		let okay = text?.contains("欢迎您回来") ?? false
-		print("login \(name) \(okay)")
-		return okay
+		if let html {
+			let formhash = capturedGroups(regex: #"<a href="logging.php\?action=logout&amp;formhash=([^"]+)">退出</a>"#, text: html, skipFirst: true)
+			print("login \(name) \(formhash)")
+			return formhash.count > 0 ? formhash[0] : nil
+		} else {
+			return nil
+		}
 	}
 	
 	public func logout() async {
 		
-		let text = try? await request(method: "GET", url: host + "logging.php?action=logout", retry: false)
+		let text = try? await request(method: "GET", url: host + "logging.php?action=logout&formhash=\(sharedFormHash ?? "")", retry: false)
 		print("logout: \(text ?? "")")
 		
 		let cookieStore = HTTPCookieStorage.shared
 		for cookie in cookieStore.cookies ?? [] {
-//			print("cookie:\(cookie)")
+			if debug_cookies {
+				print("cookie:\(cookie)")
+			}
 			cookieStore.deleteCookie(cookie)
 		}
 	}
@@ -234,25 +328,33 @@ public struct DiscuzAPI {
 		let html = try? await request(url: host + "viewthread.php?tid=\(tid)&page=\(page)")
 		if let html {
 			
-			let rows = html.components(separatedBy: "onclick=\"showWindow('report', this.href);")
+			let rows = html.components(separatedBy: "onclick=\"showWindow('reply', this.href);")
 			
 			if rows.isEmpty {
 				print("html: \(html)")
 			}
 			
 			for var row in rows {
-				// remove signature
-				row = row.replace(pattern: "<div class=\"signatures\".*", with: "", options: [])
+				row = [
+					// remove signature
+					"<div class=\"signatures\".*",
+					// remove report
+					".*onclick=\"showWindow\\('report', this.href\\);.*"
+				].reduce(row) {
+					$0.replace(pattern:$1, with: "", options: [])
+				}
+				
 				let col = capturedGroups(regex: "<table id=\"pid(\\d+)\".*?space.php\\?uid=(\\d+).*?>([^<]+)</a>.*href=\"space.php\\?uid=.*?<img src=\"([^\"]+)\".*<em>(\\d+)</em><sup>#</sup>.*<em id=.*?>发表于 ([^<]+)</em>.*(<table cell.*)", text: row, skipFirst: true)
 				
 				if col.isEmpty {
-					print("row:+++++++++++++++++++++++++++++++++++\(row.count) \n\(row)")
+					if debug_loadreplies {
+						print("row:+++++++++++++++++++++++++++++++++++\(row.count) \n\(row)")
+					}
 				} else {
 					let user = User(id: col[1], name: col[2], avatar: col[3])
 					let body = col[6]
 					let markdown = makeMarkdown(src:body)
 					let reply = Reply(id: col[0], author:user, at: col[5], index: col[4], body: body, markdown: markdown)
-					print("reply:\(reply.author)")
 					replies.append(reply)
 				}
 			}
@@ -296,7 +398,9 @@ public struct DiscuzAPI {
 					let channel = Channel(id: col[0], title: col[1], description: col[2], newPosts: newPosts)
 					channels.append(channel)
 				} else {
-					print("channel: +++++++++++++++++++++++++++++\n\(row)")
+					if debug_loadreplies {
+						print("channel: +++++++++++++++++++++++++++++\n\(row)")
+					}
 				}
 			}
 		}
@@ -308,7 +412,7 @@ public struct DiscuzAPI {
 		print("start load user \(name)")
 		var user : User?
 		
-		if let urlencoded = name.urlencoded(){
+		if let urlencoded = name.urlencode(){
 			
 			let html = try? await request(url: host + "space.php?username=\(urlencoded)")
 			if let html {
@@ -359,9 +463,59 @@ public struct DiscuzAPI {
 		
 		let okay = text?.contains("此主题已成功添加到收藏夹中") ?? false
 		if !okay {
-			print("bookmark \(id): \(String(describing: text))")
+			print("bookmark \(id): \(text ?? "")")
 		}
 		
 		return okay
+	}
+	
+	public func postReply(fid: String, tid: String, content: String) async -> Bool {
+		print("reply fid:\(fid) tid:\(tid) msg:\(content)")
+		
+		let cookie = HTTPCookie(properties: [
+			.domain: "www.4d4y.com",
+			.path: "/",
+			.name: "discuz_fastpostrefresh",
+			.value: "0",
+			.secure: "FALSE",
+			.discard: "TRUE"
+		])
+		
+		if let cookie {
+			HTTPCookieStorage.shared.setCookie(cookie)
+			print("Cookie inserted: \(cookie)")
+		}
+		
+		let result = try? await request2(method: "POST",
+										 url: host + "post.php?action=reply&fid=\(fid)&tid=\(tid)&extra=page%3D1&replysubmit=yes&infloat=yes&handlekey=fastpost&inajax=1",
+										 args: [
+											("formhash", sharedFormHash!),
+											("subject", ""),
+											("usesig", "0"),
+											("message", content.urlencode()!),
+										 ]
+		)
+		
+//		HTTPCookieStorage.shared.deleteCookie(cookie!)
+		
+		handleResult(html: result?.text)
+		return true
+	}
+	
+	private func handleResult(html: String?) {
+		if let html {
+			
+			if html.contains("非常感谢，您的回复已经发布，现在将转入主题页") {
+				return
+			}
+			
+			// <div class="alert_info"> <p>您的请求来路不正确，无法提交。</p> </div>
+			let foo = capturedGroups(regex: #"<div class="postbox">(.*?)</div>"#, text: html)
+			if !foo.isEmpty {
+				print("result: \(foo[0]) ")
+			} else {
+				print("result: \(html)")
+			}
+		}
 	}
 }

@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		100FF467291D40B400CF6F01 /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = 100FF466291D40B400CF6F01 /* MarkdownUI */; };
+		100FF469291E7F8300CF6F01 /* FloatingPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100FF468291E7F8300CF6F01 /* FloatingPanel.swift */; };
 		101E9432290E338400F92620 /* DiscoveryOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 101E9431290E338400F92620 /* DiscoveryOSApp.swift */; };
 		101E9434290E338400F92620 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 101E9433290E338400F92620 /* MainView.swift */; };
 		101E9436290E338400F92620 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 101E9435290E338400F92620 /* Assets.xcassets */; };
@@ -43,6 +44,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		100FF468291E7F8300CF6F01 /* FloatingPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingPanel.swift; sourceTree = "<group>"; };
+		100FF46A2921E56E00CF6F01 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		101E942E290E338400F92620 /* DiscoveryOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DiscoveryOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		101E9431290E338400F92620 /* DiscoveryOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoveryOSApp.swift; sourceTree = "<group>"; };
 		101E9433290E338400F92620 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
@@ -115,6 +118,7 @@
 		101E9430290E338400F92620 /* DiscoveryOS */ = {
 			isa = PBXGroup;
 			children = (
+				100FF46A2921E56E00CF6F01 /* Info.plist */,
 				101E9431290E338400F92620 /* DiscoveryOSApp.swift */,
 				108A6F2F29123E700014DB4E /* Views */,
 				101E9435290E338400F92620 /* Assets.xcassets */,
@@ -169,6 +173,7 @@
 			isa = PBXGroup;
 			children = (
 				101E9433290E338400F92620 /* MainView.swift */,
+				100FF468291E7F8300CF6F01 /* FloatingPanel.swift */,
 				108A6F3029123E940014DB4E /* ChannelView.swift */,
 				108A6F3229123EC50014DB4E /* PostListCellView.swift */,
 				108A6F3429123EF50014DB4E /* PostDetailView.swift */,
@@ -319,6 +324,7 @@
 			files = (
 				104BA599291A933300E14756 /* CurrentUserStore.swift in Sources */,
 				108A6F3129123E940014DB4E /* ChannelView.swift in Sources */,
+				100FF469291E7F8300CF6F01 /* FloatingPanel.swift in Sources */,
 				108A6F3329123EC50014DB4E /* PostListCellView.swift in Sources */,
 				108A6F3729123F210014DB4E /* ReplyCellView.swift in Sources */,
 				101E9434290E338400F92620 /* MainView.swift in Sources */,
@@ -487,6 +493,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"DiscoveryOS/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = DiscoveryOS/Info.plist;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -517,6 +524,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"DiscoveryOS/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = DiscoveryOS/Info.plist;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

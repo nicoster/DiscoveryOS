@@ -25,7 +25,7 @@ struct ChannelView: View {
 				List {
 					if let posts {
 						ForEach (posts) { post in
-							PostListCellView(post:post, channel:channel.title)
+							PostListCellView(post:post, channel:channel)
 						}
 					}
 					

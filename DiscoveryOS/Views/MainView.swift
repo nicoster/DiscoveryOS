@@ -223,8 +223,10 @@ struct MainView: View {
 //						Label("消息", systemImage: "envelope")
 //					}
 					
-					NavigationLink(destination: ChannelView(channel: Channel(id:"BOOKMARK", title: "我的收藏", description: "", newPosts: 0))) {
-						Label("收藏", systemImage: "star")
+					if currentUser.verified {
+						NavigationLink(destination: ChannelView(channel: Channel(id:"BOOKMARK", title: "我的收藏", description: "", newPosts: 0))) {
+							Label("收藏", systemImage: "star")
+						}
 					}
 				}
 			}

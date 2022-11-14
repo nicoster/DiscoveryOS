@@ -10,7 +10,7 @@ import Kingfisher
 
 struct PostListCellView : View {
 	let post : Post
-	let channel : String
+	let channel : Channel
 	@State var user : User?
 	@State var loaded : Bool = false
 	
