@@ -41,8 +41,8 @@ struct PostListCellView : View {
 							Text("•")
 						}
 						
-						if let lastModified = post.lastReplyAt ?? post.created {
-							Text(lastModified)
+						if let lastModified = post.lastReplyAt ?? post.at {
+							Text(lastModified.toDate()?.fromNow() ?? lastModified)
 						}
 					}
 					.foregroundColor(.gray)

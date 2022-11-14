@@ -27,7 +27,7 @@ public struct Post : Identifiable {
 	public let title: String
 	public let uid: String?
 	public let author: String?
-	public let created: String?
+	public let at: String?
 	public let replies: Int
 	public let views: Int?
 	public let lastReplyBy: String?
@@ -372,7 +372,7 @@ public struct DiscuzAPI {
 			for row in rows {
 				let col = capturedGroups(regex: "<span[^>]*><a href=\"viewthread.php\\?tid=(\\d+)[^>]*>([^<]+).*href=\"space.php\\?uid=(\\d+)\">([^<]+)</a>.*<em>(\\d{4}-\\d{1,2}-\\d{1,2})</em>.*<td class=\"nums\"><strong>(\\d+)</strong>/<em>(\\d+)</em></td>.*space.php\\?username=[^\"]+\">([^<]+)<.*lastpost\">([^<]+)<", text: row, skipFirst: true)
 				if col.count > 0 {
-					let post = Post(id:col[0], title: col[1].htmlDecoded, uid:col[2], author:col[3].removingPercentEncoding ?? col[3], created: col[4], replies: Int(col[5]) ?? 0, views: Int(col[6]) ?? 0, lastReplyBy: col[7].removingPercentEncoding ?? col[7], lastReplyAt: col[8])
+					let post = Post(id:col[0], title: col[1].htmlDecoded, uid:col[2], author:col[3].removingPercentEncoding ?? col[3], at: col[4], replies: Int(col[5]) ?? 0, views: Int(col[6]) ?? 0, lastReplyBy: col[7].removingPercentEncoding ?? col[7], lastReplyAt: col[8])
 					posts.append(post)
 				} else {
 					print("fields:", col)
@@ -449,7 +449,7 @@ public struct DiscuzAPI {
 				let col = capturedGroups(regex: "<a href=\"viewthread.php\\?tid=(\\d+).*?>([^<]+)</a>.*?<a href=\"forumdisplay.php.*?>([^<]+)</a>.*?<td class=\"nums\">(\\d+)</td>.*?space.php\\?username[^>]+>([^<]+)</a>.*?lastpost\">([^<]+)</a>", text: row, skipFirst: true)
 				if col.count > 0 {
 					// print(col)
-					let post = Post(id:col[0], title: col[1].htmlDecoded, uid:nil, author:nil, created: nil, replies: Int(col[3]) ?? 0, views: nil, lastReplyBy: col[4].removingPercentEncoding ?? col[4], lastReplyAt: col[5])
+					let post = Post(id:col[0], title: col[1].htmlDecoded, uid:nil, author:nil, at: nil, replies: Int(col[3]) ?? 0, views: nil, lastReplyBy: col[4].removingPercentEncoding ?? col[4], lastReplyAt: col[5])
 					bookmarks.append(post)
 				}
 			}

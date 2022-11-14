@@ -22,3 +22,13 @@ extension Date {
   }
   
 }
+
+extension String {
+	func toDate() -> Date? {
+		let dateFormatterUK = DateFormatter()
+		dateFormatterUK.dateFormat = "yyyy-MM-dd HH:mm"
+
+//		let stringDate = "2022-11-14 14:3"
+		return dateFormatterUK.date(from: self)
+	}
+}

@@ -15,14 +15,14 @@ struct DiscoveryOSApp: App {
 	init(){
 		KingfisherManager.shared.downloader.sessionConfiguration = URLSessionConfiguration.default
 		
-		URLSessionConfiguration.default.connectionProxyDictionary = [
-		  kCFNetworkProxiesHTTPEnable: true,
-		  kCFNetworkProxiesHTTPProxy: "localhost",
-		  kCFNetworkProxiesHTTPPort: "8080",
-		  kCFNetworkProxiesHTTPSEnable: true,
-		  kCFNetworkProxiesHTTPSProxy: "localhost",
-		  kCFNetworkProxiesHTTPSPort: "8080"
-		]
+//		URLSessionConfiguration.default.connectionProxyDictionary = [
+//		  kCFNetworkProxiesHTTPEnable: true,
+//		  kCFNetworkProxiesHTTPProxy: "localhost",
+//		  kCFNetworkProxiesHTTPPort: "8080",
+//		  kCFNetworkProxiesHTTPSEnable: true,
+//		  kCFNetworkProxiesHTTPSProxy: "localhost",
+//		  kCFNetworkProxiesHTTPSPort: "8080"
+//		]
 	}
 	var body: some Scene {
 		WindowGroup {

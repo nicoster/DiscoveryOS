@@ -23,25 +23,26 @@ struct PostDetailView : View {
 	
 	@State var titleAppear : Bool = true
 	
+	@State var bookmarked = false
+	
 	func hasMoreReplies() -> Bool {
 		lastPage < 0 && replies?.count ?? 0 > 0
 	}
 	
 	var body: some View {
 		List {
-			VStack(alignment: .leading, spacing: 5) {
-				HStack {
-					Text(postInfo.title)
-						.font(.title)
-						.lineLimit(3)
-//						.navigationTitle(titleAppear ? "\(channel.title)" : "\(channel) - \(postInfo.title)")
-				}
-			}
+			//			VStack(alignment: .leading, spacing: 5) {
+			//				HStack {
+			//					Text(postInfo.title)
+			//						.font(.title)
+			//						.lineLimit(3)
+			//				}
+			//			}
 			
 			
 			if mainPageLoaded, let mainPost, let replies {
 				ReplyCellView(reply: mainPost, post: postInfo, first: true)
-
+				
 				ForEach (replies) { reply in
 					ReplyCellView(reply: reply)
 				}
@@ -66,9 +67,9 @@ struct PostDetailView : View {
 			}
 		}
 		.textSelection(.enabled)
-		#if os(macOS)
+#if os(macOS)
 		.foregroundColor(Color(NSColor.labelColor))
-		#endif
+#endif
 		.task {
 			if !mainPageLoaded {
 				replies = await discuz.loadReplies(tid: postInfo.id)
@@ -84,10 +85,29 @@ struct PostDetailView : View {
 			}
 		}
 		.toolbar {
-			ToolbarItemGroup {
+			ToolbarItem(placement: .principal) {
 				if let title = postInfo.title {
 					Text(title)
 						.font(.title)
+				}
+			}
+			
+			ToolbarItemGroup {
+				
+				if let title = postInfo.title {
+					Link(destination: URL(string: discuz.host + "viewthread.php?tid=\(postInfo.id)")!) {
+						Image(systemName: "safari")
+					}
+					.foregroundColor(Color(NSColor.secondaryLabelColor))
+					
+					Button {
+						Task {
+							bookmarked = await discuz.bookmarkPost(id: postInfo.id)
+						}
+					} label: {
+						Image(systemName: bookmarked ? "star.fill" : "star" )
+					}
+					.buttonStyle(.borderless)
 					
 					Button {
 						showingPanel.toggle()
@@ -116,9 +136,9 @@ struct PostDetailView : View {
 									} label: {
 										Label("Submit", systemImage: "paperplane")
 									}
-//									.buttonStyle(.borderless)
+									//									.buttonStyle(.borderless)
 									//FIXME: doesn't work, why?
-//									.disabled(replyContent.count < 10)
+									//									.disabled(replyContent.count < 10)
 								}
 								.padding([.top, .leading, .trailing], 8)
 								ZStack {
@@ -130,6 +150,7 @@ struct PostDetailView : View {
 						}
 						.font(.system(size: 14))
 					})
+					
 				}
 			}
 		}

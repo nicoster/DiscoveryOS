@@ -62,7 +62,7 @@ struct ReplyCellView : View {
 					}
 					
 					if let created = reply.at {
-						Text(created)
+						Text(created.toDate()?.fromNow() ?? created)
 					}
 					
 					if let index = reply.index {
@@ -96,21 +96,6 @@ struct ReplyCellView : View {
 					//
 					//					}
 					
-					if let postId = post?.id {
-						Button {
-							Task {
-								bookmarked = await discuz.bookmarkPost(id: postId)
-							}
-						} label: {
-							Image(systemName: bookmarked ? "star.fill" : "star" )
-						}
-						.buttonStyle(.borderless)
-						
-						Link(destination: URL(string: discuz.host + "viewthread.php?tid=\(postId)")!) {
-							Image(systemName: "safari")
-						}
-						
-					}
 				}
 #if os(macOS)
 				.foregroundColor(Color(NSColor.tertiaryLabelColor))

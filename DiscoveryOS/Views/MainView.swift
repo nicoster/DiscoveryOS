@@ -234,7 +234,7 @@ struct MainView: View {
 			.frame(minWidth: 200)
 			#if os(macOS)
 			.toolbar {
-				ToolbarItemGroup {
+				ToolbarItemGroup(placement: .navigation) {
 					Button(action:{
 						NSApp.keyWindow?.initialFirstResponder?.tryToPerform(
 							#selector(NSSplitViewController.toggleSidebar(_:)), with: nil)
