@@ -9,6 +9,12 @@ import SwiftUI
 import MarkdownUI
 import Kingfisher
 
+struct PostDraft : Codable {
+	let id : String?
+	let title : String?
+	let content : String?
+}
+
 struct PostDetailView : View {
 	let postInfo : Post
 	let channel : Channel
@@ -152,6 +158,35 @@ struct PostDetailView : View {
 					})
 					
 				}
+			}
+		}
+		.onAppear {
+			if let draft = loadReplyDraft() {
+				replyContent = draft.content ?? ""
+			}
+		}
+		.onDisappear {
+			saveReplyDraft(draft: PostDraft(id:postInfo.id, title: postInfo.title, content: replyContent))
+		}
+	}
+	
+	var draftKey : String {
+		"draft-\(postInfo.id)"
+	}
+	
+	func loadReplyDraft() -> PostDraft? {
+		print("load draft ..")
+		if let data = UserDefaults.standard.object(forKey: draftKey) as? Data {
+			return try? JSONDecoder().decode(PostDraft.self, from: data)
+		}
+		return nil
+	}
+	
+	func saveReplyDraft(draft: PostDraft) {
+		if !replyContent.isEmpty {
+			print("save draft \(draft)")
+			if let encoded = try? JSONEncoder().encode(draft) {
+				UserDefaults.standard.set(encoded, forKey: draftKey)
 			}
 		}
 	}

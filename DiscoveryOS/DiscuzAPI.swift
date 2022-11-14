@@ -72,7 +72,7 @@ extension String {
 				if $1 <= 127, CharacterSet.urlQueryAllowed.contains(scalar) {
 					$0 += String(Character(scalar))
 				} else {
-					$0 += "%" + String($1, radix:16, uppercase: true)
+					$0 += String(format:"%%%02X", $1)
 				}
 			}
 		}

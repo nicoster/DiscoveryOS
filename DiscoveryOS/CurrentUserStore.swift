@@ -33,8 +33,16 @@ public let sharedSubject = PassthroughSubject<EventType, Never>()
 	
 	public init() {
 		
+#if DEBUG
+		if let data = UserDefaults.standard.object(forKey:KeychainCredKey) as? Data,
+		   let tokens = String(data: data, encoding: .utf8)?.components(separatedBy: ":"),
+		   tokens.count == 2,
+		   verifyCred(u: tokens[0], p: tokens[1], save:false) {
+			return
+		}
+#endif
+		
 		if let cred = keychain[KeychainCredKey] {
-//			print("cred:\(cred)")
 			let tokens = cred.components(separatedBy: ":")
 			
 			if tokens.count == 2 {
@@ -54,6 +62,10 @@ public let sharedSubject = PassthroughSubject<EventType, Never>()
 				if save {
 					let cred = "\(u):\(p)"
 					keychain[KeychainCredKey] = cred
+					
+#if DEBUG
+					UserDefaults.standard.set(cred.data(using:.utf8), forKey: KeychainCredKey)
+#endif
 				}
 				
 				verified = true
