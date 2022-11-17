@@ -53,20 +53,36 @@ struct ChannelView: View {
 				firstLoaded = true
 			}
 		}
-		.refreshable {
-			print("refresh..")
-			posts = nil
-			firstLoaded = false
-			allLoaded = false
-			page = 0
-			
-			await loadMorePosts()
-			firstLoaded = true
-		}
+		//FIXME: not working for pull and refresh, why?
+//		.refreshable {
+//			refresh()
+//		}
 		.navigationTitle(channel.title)
 #if os(macOS)
 		.navigationSubtitle(channel.description)
+		.toolbar {
+			ToolbarItemGroup(placement: .navigation) {
+				Button {
+					Task {
+						await refresh()
+					}
+				} label: {
+					Image(systemName: "arrow.clockwise")
+				}
+			}
+		}
 #endif
+	}
+	
+	func refresh() async {
+		print("refresh posts..")
+		posts = nil
+		firstLoaded = false
+		allLoaded = false
+		page = 0
+		
+		await loadMorePosts()
+		firstLoaded = true
 	}
 	
 	func loadMorePosts() async {

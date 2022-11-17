@@ -29,13 +29,21 @@ struct WebView : NSViewRepresentable {
 #endif
 
 struct ReplyCellView : View {
+	let channel : Channel
 	let reply : Reply
-	let post : Post?
+	let post : Post
 	let first : Bool
-	@State private var showingPopover = false
+//	@State private var showingPopover = false
 	@State var bookmarked = false
 	
-	init(reply: Reply, post: Post? = nil, first: Bool = false) {
+	@Binding var showingReplyPanel : Bool
+	@Binding var replyContent : String
+	
+	init(showingReplyPanel: Binding<Bool>, replyContent : Binding<String>, channel: Channel, reply: Reply, post: Post, first: Bool = false) {
+		self._showingReplyPanel = showingReplyPanel
+		self._replyContent = replyContent
+		
+		self.channel = channel
 		self.reply = reply
 		self.post = post
 		self.first = first
@@ -81,6 +89,17 @@ struct ReplyCellView : View {
 					}
 					.buttonStyle(.borderless)
 					
+					Button {
+						showingReplyPanel.toggle()
+						if showingReplyPanel {
+							replyContent = discuz.quoted(channel: channel, postInfo: post, quote: reply) + replyContent
+						}
+					} label: {
+						Image(systemName: replyContent.isEmpty ? "bubble.left" : "ellipsis.bubble.fill")
+					}
+					.keyboardShortcut(.defaultAction)
+					.buttonStyle(.borderless)
+					.help("Enter to reply")
 					
 					//					Button {
 					//						showingPopover = true

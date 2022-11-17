@@ -15,6 +15,92 @@ struct PostDraft : Codable {
 	let content : String?
 }
 
+struct ReplyView : View {
+	@Binding var content : String
+	@Binding var showingPanel : Bool
+	
+	let channel : Channel
+	let postInfo : Post
+	
+	// see https://stackoverflow.com/a/56975728/590307
+	init(content: Binding<String>, showingPanel: Binding<Bool>, channel: Channel, postInfo: Post, quote: Reply?) {
+		self._content = content
+		self._showingPanel = showingPanel
+		self.channel = channel
+		self.postInfo = postInfo
+		
+		if let quote {
+			self.content = discuz.quoted(channel: channel, postInfo: postInfo, quote: quote)
+		} else {
+			self.content = ""
+		}
+	}
+	
+	var body: some View {
+		ZStack {
+			VStack {
+				HStack {
+					//FIXME: doesn't change icon accordingly. why?
+					Image(systemName: content.isEmpty ? "bubble.left" : "ellipsis.bubble.fill")
+					if let title = postInfo.title {
+						Text(title)
+					}
+					Spacer()
+					Button {
+						Task {
+							let okay = await discuz.postReply(fid: channel.id, tid: postInfo.id, content: content)
+							if okay {
+								content = ""
+								showingPanel = false
+							}
+						}
+					} label: {
+						Label("Submit", systemImage: "paperplane")
+					}
+					//									.buttonStyle(.borderless)
+					//FIXME: doesn't work, why?
+					//									.disabled(replyContent.count < 10)
+				}
+				.padding([.top, .leading, .trailing], 8)
+				ZStack {
+					TextEditor(text: $content)
+						.padding(0)
+				}
+			}
+		}
+		.font(.system(size: 14))
+		.onAppear {
+			if let draft = loadReplyDraft() {
+				content = draft.content ?? ""
+			}
+		}
+		.onDisappear {
+			saveReplyDraft(draft: PostDraft(id:postInfo.id, title: postInfo.title, content: content))
+		}
+	}
+	
+	var draftKey : String {
+		"draft-\(postInfo.id)"
+	}
+
+	func loadReplyDraft() -> PostDraft? {
+		print("load draft ..")
+		if let data = UserDefaults.standard.object(forKey: draftKey) as? Data {
+			return try? JSONDecoder().decode(PostDraft.self, from: data)
+		}
+		return nil
+	}
+	
+	func saveReplyDraft(draft: PostDraft) {
+		if !content.isEmpty {
+			print("save draft \(draft)")
+			if let encoded = try? JSONEncoder().encode(draft) {
+				UserDefaults.standard.set(encoded, forKey: draftKey)
+			}
+		}
+	}
+}
+
 struct PostDetailView : View {
 	let postInfo : Post
 	let channel : Channel
@@ -47,11 +133,9 @@ struct PostDetailView : View {
 			
 			
 			if mainPageLoaded, let mainPost, let replies {
-				ReplyCellView(reply: mainPost, post: postInfo, first: true)
+				ReplyCellView(showingReplyPanel: $showingPanel, replyContent: $replyContent, channel: channel, reply: mainPost, post: postInfo, first: true)
 				
-				ForEach (replies) { reply in
-					ReplyCellView(reply: reply)
-				}
+				ForEach (replies) { ReplyCellView(showingReplyPanel: $showingPanel, replyContent: $replyContent, channel: channel, reply: $0, post: postInfo) }
 			} else {
 				HStack {
 					Spacer()
@@ -100,97 +184,40 @@ struct PostDetailView : View {
 			
 			ToolbarItemGroup {
 				
-				if let title = postInfo.title {
-					Link(destination: URL(string: discuz.host + "viewthread.php?tid=\(postInfo.id)")!) {
-						Image(systemName: "safari")
-					}
-					.foregroundColor(Color(NSColor.secondaryLabelColor))
-					
-					Button {
-						Task {
-							bookmarked = await discuz.bookmarkPost(id: postInfo.id)
-						}
-					} label: {
-						Image(systemName: bookmarked ? "star.fill" : "star" )
-					}
-					.buttonStyle(.borderless)
-					
-					Button {
-						showingPanel.toggle()
-					} label: {
-						Label("Reply", systemImage: replyContent.isEmpty ? "bubble.left" : "ellipsis.bubble.fill")
-					}
-					.keyboardShortcut(.defaultAction)
-					.buttonStyle(.borderless)
-					.help("Enter to reply")
-					.floatingPanel(isPresented: $showingPanel, content: {
-						ZStack {
-							VStack {
-								HStack {
-									//FIXME: doesn't change icon accordingly. why?
-									Image(systemName: replyContent.isEmpty ? "bubble.left" : "ellipsis.bubble.fill")
-									Text(title)
-									Spacer()
-									Button {
-										Task {
-											let okay = await discuz.postReply(fid: channel.id, tid: postInfo.id, content: replyContent)
-											if okay {
-												replyContent = ""
-												showingPanel = false
-											}
-										}
-									} label: {
-										Label("Submit", systemImage: "paperplane")
-									}
-									//									.buttonStyle(.borderless)
-									//FIXME: doesn't work, why?
-									//									.disabled(replyContent.count < 10)
-								}
-								.padding([.top, .leading, .trailing], 8)
-								ZStack {
-									TextEditor(text: $replyContent)
-									//											.foregroundColor(.secondary)
-										.padding(0)
-								}
-							}
-						}
-						.font(.system(size: 14))
-					})
-					
+				Link(destination: URL(string: discuz.host + "viewthread.php?tid=\(postInfo.id)")!) {
+					Image(systemName: "safari")
 				}
+				.foregroundColor(Color(NSColor.secondaryLabelColor))
+				
+				Button {
+					Task {
+						bookmarked = await discuz.bookmarkPost(id: postInfo.id)
+					}
+				} label: {
+					Image(systemName: bookmarked ? "star.fill" : "star" )
+				}
+				.buttonStyle(.borderless)
+				
+				Button {
+					showingPanel.toggle()
+				} label: {
+					Label("Reply", systemImage: replyContent.isEmpty ? "bubble.left" : "ellipsis.bubble.fill")
+				}
+				.keyboardShortcut(.defaultAction)
+				.buttonStyle(.borderless)
+				.help("Enter to reply")
+				.floatingPanel(isPresented: $showingPanel, content: {
+					ReplyView(content: $replyContent,
+							  showingPanel: $showingPanel,
+							  channel: channel,
+							  postInfo: postInfo,
+							  quote: nil)
+				})
 			}
 		}
-		.onAppear {
-			if let draft = loadReplyDraft() {
-				replyContent = draft.content ?? ""
-			}
-		}
-		.onDisappear {
-			saveReplyDraft(draft: PostDraft(id:postInfo.id, title: postInfo.title, content: replyContent))
-		}
+
 	}
-	
-	var draftKey : String {
-		"draft-\(postInfo.id)"
-	}
-	
-	func loadReplyDraft() -> PostDraft? {
-		print("load draft ..")
-		if let data = UserDefaults.standard.object(forKey: draftKey) as? Data {
-			return try? JSONDecoder().decode(PostDraft.self, from: data)
-		}
-		return nil
-	}
-	
-	func saveReplyDraft(draft: PostDraft) {
-		if !replyContent.isEmpty {
-			print("save draft \(draft)")
-			if let encoded = try? JSONEncoder().encode(draft) {
-				UserDefaults.standard.set(encoded, forKey: draftKey)
-			}
-		}
-	}
-	
+
 	func loadMoreReplies() {
 		Task {
 			page += 1

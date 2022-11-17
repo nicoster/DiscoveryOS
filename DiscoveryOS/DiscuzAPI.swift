@@ -63,13 +63,28 @@ extension String {
 //
 //	}
 	
+	func htmlEntities() -> String {
+		String(flatMap {
+			if let value = $0.unicodeScalars.first?.value,
+			   (value > 127 && value < 0x3000) || value > 0x9fff {
+				return "&#\(value);"
+			} else {
+				return String($0)
+			}
+		})
+	}
+	
 	func urlencode(using encoding: String.Encoding = .gb_18030_2000) -> String? {
 		var res = ""
 		let src = self.replacingOccurrences(of: " ", with: "+")
+		let allowedSet = NSMutableCharacterSet()
+		allowedSet.formUnion(with:CharacterSet.urlQueryAllowed)
+		allowedSet.removeCharacters(in: "&")
+		let allowed = allowedSet as CharacterSet
 		if let data = src.data(using: encoding) {
 			res = data.reduce(into:res) {
 				let scalar = UnicodeScalar($1)
-				if $1 <= 127, CharacterSet.urlQueryAllowed.contains(scalar) {
+				if $1 <= 127, allowed.contains(scalar) {
 					$0 += String(Character(scalar))
 				} else {
 					$0 += String(format:"%%%02X", $1)
@@ -116,6 +131,7 @@ public struct DiscuzAPI {
 	let debug_misc = false
 	let debug_cookies = false
 	let debug_traffic = false
+	let debug_encoding = true
 	
 	let host = "https://www.4d4y.com/forum/"
 	let loginRequired = "<select name=\"loginfield\" id=\"loginfield\">"
@@ -131,6 +147,8 @@ public struct DiscuzAPI {
 		self.pass = pass
 	}
 	
+	let LineSeparator = "\u{2028}"
+	
 	public func makeMarkdown(src: String) -> String {
 		var result : String = src
 		
@@ -139,10 +157,11 @@ public struct DiscuzAPI {
 		result = [
 			("<a href=\"javascript:;\"><img onclick=\"zoom\\(this, '([^']+)'.*?</a>", "![]($1)"),
 			("<a\\s+href=\"([^\"]+)\".*?>(.*?)</a>", "[$2]($1)"),
-			// 2 passes to handle 1 image has both `src` and `file` attributes
+			("<img\\s+[^<>]*?src=\"([^\"]+images/smilies/default[^\"]+)\"", "![$2]($1)<img"),
+			// 2 passes to handle 1 image with both `src` and `file` attributes
 			("<img\\s+[^<>]*?(?:file|src)=\"([^\"]+)\"", "\n<br/>![$2]($1)\n<img"),
 			("<img\\s+[^<>]*?(?:file|src)=\"([^\"]+)\"", "\n<br/>![$2]($1)\n<img"),
-			("<blockquote>", "<br/>```<br/><br/>"),
+			("<blockquote>", "```"),
 			("([^>]+发表于.*?)</blockquote>", "```<br/>\n$1")
 		].reduce(result) {
 			$0.replace(pattern: $1.0, with: $1.1)
@@ -155,13 +174,8 @@ public struct DiscuzAPI {
 		if let attributed = try? NSAttributedString(data: result.data(using: .unicode)!, options: [.documentType: NSAttributedString.DocumentType.html], documentAttributes: nil) {
 			result = attributed.string.replace(pattern: "\\[\\s*\n", with: "[")
 				.replacingOccurrences(of: "[\\s*\n", with: "")
-			
-			if let range = result.range(of: "```", options: NSString.CompareOptions.backwards) {
-				//FIXME: there must be a better way to do this
-				result = result.replacingOccurrences(of: "\n", with: "\n\n", range: range.lowerBound..<String.Index(encodedOffset:result.utf16.count))
-			} else {
-				result = result.replacingOccurrences(of: "\n", with: "\n\n")
-			}
+				.replace(pattern:"\n{3,}", with: "\n")
+				.replacingOccurrences(of: "\n", with: LineSeparator)
 		}
 		
 		return result
@@ -190,7 +204,6 @@ public struct DiscuzAPI {
 			
 			let start = skipFirst ? 1 : 0
 			for i in start..<match.numberOfRanges {
-				//				print("i: \(i) \(match.range(at: i))")
 				if let sub = Range(match.range(at: i), in: text) {
 					results.append(String(text[sub]))
 				}
@@ -199,8 +212,6 @@ public struct DiscuzAPI {
 		
 		return results
 	}
-	
-	
 	
 	func request2(method: String = "GET", url: String, args: [(String, Any)]? = nil,
 				  moreheaders: [String: String]? = nil, retry : Bool = true) async throws -> (text: String?, resp: URLResponse?) {
@@ -223,9 +234,7 @@ public struct DiscuzAPI {
 			"Accept-Encoding": "gzip, deflate, br",
 			"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
 			"Connection": "keep-alive",
-			"Referer": "https://www.4d4y.com/forum/viewthread.php?tid=3110774&pid=65984949&page=1&extra=page%3D1",
 			"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.1 Safari/605.1.15",
-			"Origin": "https://www.4d4y.com",
 		]
 		if let moreheaders {
 			headers = headers.merging(moreheaders){$1}
@@ -413,7 +422,7 @@ public struct DiscuzAPI {
 		var user : User?
 		
 		if let urlencoded = name.urlencode(){
-			
+
 			let html = try? await request(url: host + "space.php?username=\(urlencoded)")
 			if let html {
 				// print(html)
@@ -469,34 +478,42 @@ public struct DiscuzAPI {
 		return okay
 	}
 	
+	func quoted(channel: Channel, postInfo: Post, quote: Reply) -> String {
+"""
+[quote] \(quote.markdown)
+[size=2][color=#999999]\(quote.author.name) 发表于 \(quote.at)[/color] [url=\(host)redirect.php?goto=findpost&pid=\(quote.id)&ptid=\(channel.id)][img]\(host)images/common/back.gif[/img][/url][/size][/quote]
+"""
+	}
+	
 	public func postReply(fid: String, tid: String, content: String) async -> Bool {
 		print("reply fid:\(fid) tid:\(tid) msg:\(content)")
 		
-		let cookie = HTTPCookie(properties: [
+
+		if let cookie = HTTPCookie(properties: [
 			.domain: "www.4d4y.com",
 			.path: "/",
 			.name: "discuz_fastpostrefresh",
 			.value: "0",
 			.secure: "FALSE",
 			.discard: "TRUE"
-		])
-		
-		if let cookie {
+		]) {
 			HTTPCookieStorage.shared.setCookie(cookie)
-			print("Cookie inserted: \(cookie)")
+//			print("Cookie inserted: \(cookie)")
 		}
 		
+		let normalized = content.replacingOccurrences(of: "\n", with: "\r\n").htmlEntities().urlencode()!
+		if debug_encoding {
+			print("normalized:\(normalized)")
+		}
 		let result = try? await request2(method: "POST",
 										 url: host + "post.php?action=reply&fid=\(fid)&tid=\(tid)&extra=page%3D1&replysubmit=yes&infloat=yes&handlekey=fastpost&inajax=1",
 										 args: [
 											("formhash", sharedFormHash!),
 											("subject", ""),
 											("usesig", "0"),
-											("message", content.urlencode()!),
+											("message", normalized),
 										 ]
 		)
-		
-//		HTTPCookieStorage.shared.deleteCookie(cookie!)
 		
 		handleResult(html: result?.text)
 		return true
