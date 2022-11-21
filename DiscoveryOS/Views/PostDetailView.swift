@@ -15,7 +15,7 @@ struct PostDraft : Codable {
 	let content : String?
 }
 
-struct ReplyView : View {
+struct DraftView : View {
 	@Binding var content : String
 	@Binding var showingPanel : Bool
 	
@@ -40,7 +40,6 @@ struct ReplyView : View {
 		ZStack {
 			VStack {
 				HStack {
-					//FIXME: doesn't change icon accordingly. why?
 					Image(systemName: content.isEmpty ? "bubble.left" : "ellipsis.bubble.fill")
 					if let title = postInfo.title {
 						Text(title)
@@ -57,9 +56,8 @@ struct ReplyView : View {
 					} label: {
 						Label("Submit", systemImage: "paperplane")
 					}
-					//									.buttonStyle(.borderless)
 					//FIXME: doesn't work, why?
-					//									.disabled(replyContent.count < 10)
+					.disabled(content.count < 10)
 				}
 				.padding([.top, .leading, .trailing], 8)
 				ZStack {
@@ -104,8 +102,10 @@ struct ReplyView : View {
 struct PostDetailView : View {
 	let postInfo : Post
 	let channel : Channel
+	let pageSize = discuz.pageSize
+	
 	@State var mainPost: Reply?
-	@State var replies : [Reply]?
+	@State var replies : [Reply] = []
 	@State var mainPageLoaded : Bool = false
 	@State var lastPage : Int = -1
 	@State var page : Int = 1
@@ -117,25 +117,45 @@ struct PostDetailView : View {
 	
 	@State var bookmarked = false
 	
+	@State var loading : Bool = false
+	
 	func hasMoreReplies() -> Bool {
-		lastPage < 0 && replies?.count ?? 0 > 0
+		lastPage < 0 && replies.count > 0
 	}
 	
 	var body: some View {
 		List {
-			//			VStack(alignment: .leading, spacing: 5) {
-			//				HStack {
-			//					Text(postInfo.title)
-			//						.font(.title)
-			//						.lineLimit(3)
-			//				}
-			//			}
 			
-			
-			if mainPageLoaded, let mainPost, let replies {
+			if mainPageLoaded, let mainPost {
 				ReplyCellView(showingReplyPanel: $showingPanel, replyContent: $replyContent, channel: channel, reply: mainPost, post: postInfo, first: true)
 				
-				ForEach (replies) { ReplyCellView(showingReplyPanel: $showingPanel, replyContent: $replyContent, channel: channel, reply: $0, post: postInfo) }
+				ForEach (replies) { reply in
+					if reply.isPlaceholder {
+						Divider()
+						HStack{
+							Spacer(minLength: 10)
+							Markdown(reply.pageSlots)
+								.background(RoundedRectangle(cornerRadius: 4).fill(.tertiary).padding(-4))
+								.environment(
+									\.openURL,
+									 OpenURLAction { url in
+										 let page = Int(url.absoluteString.from(5))!
+										 print("page:\(page)")
+										 updateReplySlot(page: page)
+										 loadMoreReplies(page: page)
+										 return .handled
+									 }
+								)
+							Spacer(minLength: 10)
+						}
+					} else if reply.isSpinner {
+						Divider()
+						ProgressView()
+							.alignmentGuide(HorizontalAlignment.center) { _ in 0}
+					} else {
+						ReplyCellView(showingReplyPanel: $showingPanel, replyContent: $replyContent, channel: channel, reply: reply, post: postInfo)
+					}
+				}
 			} else {
 				HStack {
 					Spacer()
@@ -150,7 +170,13 @@ struct PostDetailView : View {
 					Spacer()
 					ProgressView()
 						.onAppear {
-							loadMoreReplies()
+							let total = (postInfo.replies + pageSize) / pageSize
+							print("total page: \(total) replies: \(replies.count)")
+							if replies.count <= pageSize && total - page > 8 {
+								loadMoreReplies(page: page + total - 5)
+							} else {
+								loadMoreReplies(page: page + 1)
+							}
 						}
 					Spacer()
 				}
@@ -162,14 +188,13 @@ struct PostDetailView : View {
 #endif
 		.task {
 			if !mainPageLoaded {
-				replies = await discuz.loadReplies(tid: postInfo.id)
-				mainPost = replies?.first
-				if let replies {
-					if replies.count < discuz.pageSize - 3 {
-						lastPage = 1
-					}
-					self.replies = Array(replies.dropFirst())
+				let replies = await discuz.loadReplies(tid: postInfo.id)
+				mainPost = replies.first
+				if replies.count < pageSize - 3 {
+					lastPage = 1
 				}
+				
+				self.replies = Array(replies.dropFirst())
 				
 				mainPageLoaded = true
 			}
@@ -184,7 +209,7 @@ struct PostDetailView : View {
 			
 			ToolbarItemGroup {
 				
-				Link(destination: URL(string: discuz.host + "viewthread.php?tid=\(postInfo.id)")!) {
+				Link(destination: URL(string: postInfo.link)!) {
 					Image(systemName: "safari")
 				}
 				.foregroundColor(Color(NSColor.secondaryLabelColor))
@@ -207,7 +232,7 @@ struct PostDetailView : View {
 				.buttonStyle(.borderless)
 				.help("Enter to reply")
 				.floatingPanel(isPresented: $showingPanel, content: {
-					ReplyView(content: $replyContent,
+					DraftView(content: $replyContent,
 							  showingPanel: $showingPanel,
 							  channel: channel,
 							  postInfo: postInfo,
@@ -217,24 +242,114 @@ struct PostDetailView : View {
 		}
 
 	}
+	
+	typealias Spinner = Reply
+	
+	func updateReplySlot(page: Int) {
+		if let pos = findReplySlot(page: page) {
+			let old = replies.remove(at:pos)
+//			print("old:\(old.seq)+\(old.len)")
+			var new : [Reply]?
+			
+			let maxPage = old.len / pageSize
+			switch (page - old.seq / pageSize) {
+			case maxPage:
+				if maxPage == 1 {
+					new = [Spinner()]
+				} else {
+					new = [Reply(seq: old.seq, len: old.len - pageSize), Spinner()]
+				}
+			case 1:
+				new = [Spinner(), Reply(seq: old.seq + pageSize, len: old.len - pageSize)]
+			case let slot:
+				new = [
+					Reply(seq: old.seq, len: (slot - 1) * pageSize),
+					Spinner(),
+					Reply(seq: old.seq + slot * pageSize, len: (maxPage - slot) * pageSize)
+				]
+			}
+			
+			if let new {
+				replies.insert(contentsOf: new, at: pos)
+			}
+		}
+	}
+	
+	func findReplySlot(page: Int) -> Int? {
+		for (pos, reply) in replies.enumerated() {
+//			print("len:\(len), page:\(page)")
+			if reply.seq < page * pageSize && reply.seq + reply.len >= page * pageSize {
+				if reply.len % pageSize != 0 {
+					print("found wrong reply: \(reply)")
+					return nil
+				}
+				return pos
+			}
+		}
+		
+		print("found no reply, page:\(page)")
+		return nil
+	}
 
-	func loadMoreReplies() {
+	func loadMoreReplies(page : Int) {
+		if loading {
+			return
+		}
+		
+		loading = true
+		
 		Task {
-			page += 1
+			
 			if lastPage > 0 && lastPage <= page {
 				print("loaded too many page \(page) last: \(lastPage)")
 				return
 			}
 			
+			self.page = page
+			
 			let more = await discuz.loadReplies(tid: postInfo.id, page: page)
 			
+			// if replies are already loaded, it means EOF
 			for item in more {
-				if let replies, replies.first(where:{$0.id == item.id}) != nil {
+				if replies.first(where:{$0.id == item.id}) != nil {
+					print("\(item.seq)# already exists, stop loading")
 					lastPage = page
+					loading = false
 					return
 				}
 			}
-			replies?.append(contentsOf: more)
+			
+			if let first = more.first,
+			   var pos = replies.lastIndex(where: {$0.seq < first.seq}) {
+				let val = replies[pos]
+				print("pos:\(pos) val:\(val.seq)")
+				
+				let seq = val.seq + val.len
+				
+				pos += 1
+				
+				if pos != replies.endIndex && replies[pos].isSpinner {
+					replies.remove(at: pos)
+				}
+				
+//				print("val:\(val)")
+//				print("first:\(first)")
+				if first.seq > seq {
+					replies.insert(
+						Reply(seq: seq, len: first.seq - seq),
+						at: pos
+					)
+					pos += 1
+				}
+				
+				replies.insert(contentsOf: more, at: pos)
+			}
+			
+//			print("count \(replies.count)")
+			loading = false
+			
+//			replies.forEach { print("\($0.seq), \($0.len)") }
 		}
+		
 	}
 }

@@ -14,10 +14,54 @@ public struct User : Identifiable {
 }
 
 public struct Reply : Identifiable {
+
+	internal init(id: String, author: User, at: String, seq: Int, len: Int = 1, body: String, markdown: String) {
+		self.id = id
+		self.author = author
+		self.at = at
+		self.seq = seq
+		self.len = len
+		self.body = body
+		self.markdown = markdown
+	}
+	
+	internal init(seq : Int, len : Int) {
+		assert(len > 0 && seq > 0 && len != 120)
+		self.init(id: "placeholder@\(seq)",
+				  author: User(id: "", name: "", avatar: ""),
+				  at: "",
+				  seq: seq,
+				  len: len,
+				  body: "",
+				  markdown: ""
+		)
+	}
+	
+	internal init() {
+		self.init(id: "spinner",
+				  author: User(id: "", name: "", avatar: ""),
+				  at: "",
+				  seq: Int.max,
+				  len: 0,
+				  body: "",
+				  markdown: ""
+		)
+	}
+	
+	var isSpinner : Bool { id == "spinner" }
+	
+	var isPlaceholder : Bool { len > 1 }
+	var pageSlots: String {
+		//FIXME: the correct way to reference `DiscuzAPI`?
+		"折叠了 \(len) 个回帖" + discuz.LineSeparator +
+		Array((seq / discuz.pageSize + 1)..<((seq + len + discuz.pageSize) / discuz.pageSize)).map {"[\($0)](page:\($0))"}.joined(separator: " | ")
+	}
+	
 	public let id: String
 	public let author : User
 	public let at: String
-	public let index: String
+	public let seq: Int
+	public let len: Int		// when len isn't 1, this entry serves as a placeholder for multiple replies.
 	public let body: String
 	public let markdown: String
 }
@@ -32,6 +76,10 @@ public struct Post : Identifiable {
 	public let views: Int?
 	public let lastReplyBy: String?
 	public let lastReplyAt: String?
+	
+	var link : String {
+		discuz.host + "viewthread.php?tid=\(id)"
+	}
 }
 
 public struct Channel : Identifiable {
@@ -131,7 +179,7 @@ public struct DiscuzAPI {
 	let debug_misc = false
 	let debug_cookies = false
 	let debug_traffic = false
-	let debug_encoding = true
+	let debug_encoding = false
 	
 	let host = "https://www.4d4y.com/forum/"
 	let loginRequired = "<select name=\"loginfield\" id=\"loginfield\">"
@@ -157,7 +205,7 @@ public struct DiscuzAPI {
 		result = [
 			("<a href=\"javascript:;\"><img onclick=\"zoom\\(this, '([^']+)'.*?</a>", "![]($1)"),
 			("<a\\s+href=\"([^\"]+)\".*?>(.*?)</a>", "[$2]($1)"),
-			("<img\\s+[^<>]*?src=\"([^\"]+images/smilies/default[^\"]+)\"", "![$2]($1)<img"),
+			("<img\\s+[^<>]*?src=\"([^\"]+images/smilies[^\"]+)\"", "![$2]($1)<img"),
 			// 2 passes to handle 1 image with both `src` and `file` attributes
 			("<img\\s+[^<>]*?(?:file|src)=\"([^\"]+)\"", "\n<br/>![$2]($1)\n<img"),
 			("<img\\s+[^<>]*?(?:file|src)=\"([^\"]+)\"", "\n<br/>![$2]($1)\n<img"),
@@ -353,7 +401,7 @@ public struct DiscuzAPI {
 					$0.replace(pattern:$1, with: "", options: [])
 				}
 				
-				let col = capturedGroups(regex: "<table id=\"pid(\\d+)\".*?space.php\\?uid=(\\d+).*?>([^<]+)</a>.*href=\"space.php\\?uid=.*?<img src=\"([^\"]+)\".*<em>(\\d+)</em><sup>#</sup>.*<em id=.*?>发表于 ([^<]+)</em>.*(<table cell.*)", text: row, skipFirst: true)
+				let col = capturedGroups(regex: "<table id=\"pid(\\d+)\".*?space.php\\?uid=(\\d+).*?>([^<]+)</a>.*href=\"space.php\\?uid=.*?<img src=\"([^\"]+)\".*<em>(\\d+)</em><sup>#</sup>.*<em id=.*?>发表于 ([^<]+)</em>.*(<div class=\"postmessage.*)", text: row, skipFirst: true)
 				
 				if col.isEmpty {
 					if debug_loadreplies {
@@ -363,7 +411,7 @@ public struct DiscuzAPI {
 					let user = User(id: col[1], name: col[2], avatar: col[3])
 					let body = col[6]
 					let markdown = makeMarkdown(src:body)
-					let reply = Reply(id: col[0], author:user, at: col[5], index: col[4], body: body, markdown: markdown)
+					let reply = Reply(id: col[0], author:user, at: col[5], seq: Int(col[4]) ?? -1, body: body, markdown: markdown)
 					replies.append(reply)
 				}
 			}
@@ -418,7 +466,9 @@ public struct DiscuzAPI {
 	}
 	
 	public func loadUser(name: String) async -> User? {
-		print("start load user \(name)")
+		if debug_traffic {
+			print("start load user \(name)")
+		}
 		var user : User?
 		
 		if let urlencoded = name.urlencode(){

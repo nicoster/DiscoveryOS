@@ -12,7 +12,7 @@ public enum EventType {
 	case logout
 }
 
-//FIXME: there must be a right way to notify the views to update
+//FIXME: there must be a right way to notify views
 public let sharedSubject = PassthroughSubject<EventType, Never>()
 
 @MainActor public class CurrentUserStore: ObservableObject {

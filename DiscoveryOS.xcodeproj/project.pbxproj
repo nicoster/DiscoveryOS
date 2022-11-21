@@ -19,12 +19,14 @@
 		101E945D290F7D1300F92620 /* DiscuzAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 101E945C290F7D1300F92620 /* DiscuzAPI.swift */; };
 		101E946029109C5200F92620 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 101E945F29109C5200F92620 /* Kingfisher */; };
 		102872AF29223F4500299B1E /* TimeFormat.swift in Sources */ = {isa = PBXBuildFile; fileRef = 102872AE29223F4500299B1E /* TimeFormat.swift */; };
+		1035BB752927BE16002CAFB5 /* FileUploader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1035BB742927BE16002CAFB5 /* FileUploader.swift */; };
 		104BA599291A933300E14756 /* CurrentUserStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 104BA598291A933300E14756 /* CurrentUserStore.swift */; };
 		104BA59C291A953F00E14756 /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = 104BA59B291A953F00E14756 /* KeychainAccess */; };
 		108A6F3129123E940014DB4E /* ChannelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108A6F3029123E940014DB4E /* ChannelView.swift */; };
 		108A6F3329123EC50014DB4E /* PostListCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108A6F3229123EC50014DB4E /* PostListCellView.swift */; };
 		108A6F3529123EF50014DB4E /* PostDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108A6F3429123EF50014DB4E /* PostDetailView.swift */; };
 		108A6F3729123F210014DB4E /* ReplyCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108A6F3629123F210014DB4E /* ReplyCellView.swift */; };
+		10C68839292AF93B0089A94E /* String+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C68838292AF93B0089A94E /* String+Extensions.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -60,11 +62,13 @@
 		101E944F290E338500F92620 /* DiscoveryOSUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoveryOSUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		101E945C290F7D1300F92620 /* DiscuzAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscuzAPI.swift; sourceTree = "<group>"; };
 		102872AE29223F4500299B1E /* TimeFormat.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimeFormat.swift; sourceTree = "<group>"; };
+		1035BB742927BE16002CAFB5 /* FileUploader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileUploader.swift; sourceTree = "<group>"; };
 		104BA598291A933300E14756 /* CurrentUserStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CurrentUserStore.swift; sourceTree = "<group>"; };
 		108A6F3029123E940014DB4E /* ChannelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelView.swift; sourceTree = "<group>"; };
 		108A6F3229123EC50014DB4E /* PostListCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostListCellView.swift; sourceTree = "<group>"; };
 		108A6F3429123EF50014DB4E /* PostDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostDetailView.swift; sourceTree = "<group>"; };
 		108A6F3629123F210014DB4E /* ReplyCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReplyCellView.swift; sourceTree = "<group>"; };
+		10C68838292AF93B0089A94E /* String+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Extensions.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -120,6 +124,7 @@
 		101E9430290E338400F92620 /* DiscoveryOS */ = {
 			isa = PBXGroup;
 			children = (
+				10C68835292AF8E50089A94E /* Extensions */,
 				100FF46A2921E56E00CF6F01 /* Info.plist */,
 				101E9431290E338400F92620 /* DiscoveryOSApp.swift */,
 				108A6F2F29123E700014DB4E /* Views */,
@@ -127,8 +132,8 @@
 				101E943A290E338400F92620 /* DiscoveryOS.entitlements */,
 				101E9437290E338400F92620 /* Preview Content */,
 				101E945C290F7D1300F92620 /* DiscuzAPI.swift */,
-				102872AE29223F4500299B1E /* TimeFormat.swift */,
 				104BA598291A933300E14756 /* CurrentUserStore.swift */,
+				1035BB742927BE16002CAFB5 /* FileUploader.swift */,
 			);
 			path = DiscoveryOS;
 			sourceTree = "<group>";
@@ -183,6 +188,15 @@
 				108A6F3629123F210014DB4E /* ReplyCellView.swift */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		10C68835292AF8E50089A94E /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				10C68838292AF93B0089A94E /* String+Extensions.swift */,
+				102872AE29223F4500299B1E /* TimeFormat.swift */,
+			);
+			path = Extensions;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -329,12 +343,14 @@
 				108A6F3129123E940014DB4E /* ChannelView.swift in Sources */,
 				100FF469291E7F8300CF6F01 /* FloatingPanel.swift in Sources */,
 				102872AF29223F4500299B1E /* TimeFormat.swift in Sources */,
+				10C68839292AF93B0089A94E /* String+Extensions.swift in Sources */,
 				108A6F3329123EC50014DB4E /* PostListCellView.swift in Sources */,
 				108A6F3729123F210014DB4E /* ReplyCellView.swift in Sources */,
 				101E9434290E338400F92620 /* MainView.swift in Sources */,
 				108A6F3529123EF50014DB4E /* PostDetailView.swift in Sources */,
 				101E9432290E338400F92620 /* DiscoveryOSApp.swift in Sources */,
 				101E945D290F7D1300F92620 /* DiscuzAPI.swift in Sources */,
+				1035BB752927BE16002CAFB5 /* FileUploader.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

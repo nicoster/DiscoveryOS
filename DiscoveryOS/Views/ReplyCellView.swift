@@ -26,6 +26,7 @@ struct WebView : NSViewRepresentable {
 		nsView.evaluateJavaScript(jsString, completionHandler: nil)
 	}
 }
+
 #endif
 
 struct ReplyCellView : View {
@@ -55,6 +56,7 @@ struct ReplyCellView : View {
 		}
 		
 		HStack(alignment: .top) {
+			
 			if let avatar = reply.author.avatar {
 				KFImage.url(URL(string: avatar))
 					.resizable()
@@ -73,7 +75,7 @@ struct ReplyCellView : View {
 						Text(created.toDate()?.fromNow() ?? created)
 					}
 					
-					if let index = reply.index {
+					if let index = reply.seq {
 						Text("\(index)#")
 					}
 					
