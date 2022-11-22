@@ -174,7 +174,7 @@ var sharedFormHash : String? = nil
 
 public struct DiscuzAPI {
 	
-	let debug_loadreplies = false
+	let debug_loadreplies = true
 	let debug_markdown = false
 	let debug_misc = false
 	let debug_cookies = false
@@ -385,21 +385,24 @@ public struct DiscuzAPI {
 		let html = try? await request(url: host + "viewthread.php?tid=\(tid)&page=\(page)")
 		if let html {
 			
-			let rows = html.components(separatedBy: "onclick=\"showWindow('reply', this.href);")
+//			let rows = html.components(separatedBy: "onclick=\"showWindow('reply', this.href);")
+			let rows = html.components(separatedBy: #"<td class="postcontent postbottom">"#)
+//			let rows = html.ranges(of:"onclick=\"showWindow('reply', this.href);", options: .regularExpression).map { String(html[$0]) }
 			
 			if rows.isEmpty {
 				print("html: \(html)")
 			}
+			print("rows:\(rows.count)")
 			
-			for var row in rows {
-				row = [
-					// remove signature
-					"<div class=\"signatures\".*",
-					// remove report
-					".*onclick=\"showWindow\\('report', this.href\\);.*"
-				].reduce(row) {
-					$0.replace(pattern:$1, with: "", options: [])
-				}
+			for row in rows {
+//				row = [
+//					// remove signature
+//					"<div class=\"signatures\".*",
+//					// remove report
+//					".*onclick=\"showWindow\\('report', this.href\\);.*"
+//				].reduce(row) {
+//					$0.replace(pattern:$1, with: "", options: [])
+//				}
 				
 				let col = capturedGroups(regex: "<table id=\"pid(\\d+)\".*?space.php\\?uid=(\\d+).*?>([^<]+)</a>.*href=\"space.php\\?uid=.*?<img src=\"([^\"]+)\".*<em>(\\d+)</em><sup>#</sup>.*<em id=.*?>发表于 ([^<]+)</em>.*(<div class=\"postmessage.*)", text: row, skipFirst: true)
 				

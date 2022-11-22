@@ -342,7 +342,9 @@ struct PostDetailView : View {
 					pos += 1
 				}
 				
-				replies.insert(contentsOf: more, at: pos)
+				withAnimation {
+					replies.insert(contentsOf: more, at: pos)
+				}
 			}
 			
 //			print("count \(replies.count)")

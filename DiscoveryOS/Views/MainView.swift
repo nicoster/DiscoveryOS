@@ -9,7 +9,6 @@ import Combine
 import SwiftUI
 import MarkdownUI
 import Kingfisher
-//import NetworkImage
 
 
 let myNetworkImage = MarkdownImageHandler(imageAttachment: { url in
@@ -28,66 +27,7 @@ let myNetworkImage = MarkdownImageHandler(imageAttachment: { url in
 			})
 		}
 	}.eraseToAnyPublisher()
-	
-	//	let subject = PassthroughSubject<NSTextAttachment, Never>()
-	//
-	//	KingfisherManager.shared.retrieveImage(with: ImageResource(downloadURL: url), completionHandler: { result in
-	//		switch result {
-	//		case .success(let value):
-	//			let attachment = ResizableImageAttachment()
-	//			attachment.image = value.image
-	//			subject.send(attachment)
-	//		case .failure(let error):
-	//			subject.send(NSTextAttachment())
-	//		}
-	//
-	//		subject.send(completion: .finished)
-	//	})
-	//	return subject
-	//		.eraseToAnyPublisher()
-	
-	//		NetworkImageLoader.shared.image(for: url)
-	////		.receive(on: DispatchQueue.main)
-	//		  .map { image in
-	//			let attachment = ResizableImageAttachment()
-	//			attachment.image = image
-	//			return attachment
-	//		  }
-	//		  .replaceError(with: NSTextAttachment())
-	//		  .eraseToAnyPublisher()
-	
 })
-
-
-//func imagePublisher(url : URL) -> AnyPublisher<NSTextAttachment, Never> {
-//	let subject = PassthroughSubject<NSTextAttachment, Never>()
-//
-//	KingfisherManager.shared.retrieveImage(with: ImageResource(downloadURL: url), completionHandler: { result in
-//		switch result {
-//		case .success(let value):
-//			let attachment = ResizableImageAttachment()
-//			attachment.image = value.image
-//			subject.send(attachment)
-//		case .failure(let error):
-//			subject.send(NSTextAttachment())
-//		}
-//		subject.send(completion: .finished)
-//	})
-//
-//	return subject.eraseToAnyPublisher()
-//}
-//
-//func imagePublisher2(url : URL) -> AnyPublisher<NSTextAttachment, Never> {
-//	NetworkImageLoader.shared.image(for: url)
-//		.map { image in
-//			let attachment = ResizableImageAttachment()
-//			attachment.image = image
-//			return attachment
-//		}
-//		.replaceError(with: NSTextAttachment())
-//		.eraseToAnyPublisher()
-//
-//}
 
 
 struct LoginView: View {
@@ -202,26 +142,6 @@ struct MainView: View {
 					NavigationLink(destination: LoginView()) {
 						Label("用户", systemImage: "person.circle")
 					}
-//					NavigationLink(destination: Markdown("""
-//123
-//```
-//start load user Tavia
-//data: 11339 bytes
-//start load user tgv5
-//data: 13148 bytes
-//```
-//xyz
-//start load user Tavia
-//data: 11339 bytes
-//start load user tgv5
-//data: 13148 bytes
-//
-//""")
-//						.setImageHandler(myNetworkImage, forURLScheme: "https")
-//						.setImageHandler(myNetworkImage, forURLScheme: "http")
-//					) {
-//						Label("消息", systemImage: "envelope")
-//					}
 					
 					if currentUser.verified {
 						NavigationLink(destination: ChannelView(channel: Channel(id:"BOOKMARK", title: "我的收藏", description: "", newPosts: 0))) {
