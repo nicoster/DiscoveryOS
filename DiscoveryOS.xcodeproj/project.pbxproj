@@ -27,6 +27,9 @@
 		108A6F3529123EF50014DB4E /* PostDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108A6F3429123EF50014DB4E /* PostDetailView.swift */; };
 		108A6F3729123F210014DB4E /* ReplyCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108A6F3629123F210014DB4E /* ReplyCellView.swift */; };
 		10C68839292AF93B0089A94E /* String+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C68838292AF93B0089A94E /* String+Extensions.swift */; };
+		10C68841292CE8EF0089A94E /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C68840292CE8EF0089A94E /* main.swift */; };
+		10C68846292CF1C20089A94E /* DiscuzAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 101E945C290F7D1300F92620 /* DiscuzAPI.swift */; };
+		10C68848292D0F780089A94E /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 10C68847292D0F780089A94E /* Kingfisher */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -45,6 +48,18 @@
 			remoteInfo = DiscoveryOS;
 		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		10C6883C292CE8EF0089A94E /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		100FF468291E7F8300CF6F01 /* FloatingPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingPanel.swift; sourceTree = "<group>"; };
@@ -69,6 +84,8 @@
 		108A6F3429123EF50014DB4E /* PostDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostDetailView.swift; sourceTree = "<group>"; };
 		108A6F3629123F210014DB4E /* ReplyCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReplyCellView.swift; sourceTree = "<group>"; };
 		10C68838292AF93B0089A94E /* String+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Extensions.swift"; sourceTree = "<group>"; };
+		10C6883E292CE8EF0089A94E /* discuz */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = discuz; sourceTree = BUILT_PRODUCTS_DIR; };
+		10C68840292CE8EF0089A94E /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -96,6 +113,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		10C6883B292CE8EF0089A94E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				10C68848292D0F780089A94E /* Kingfisher in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -106,6 +131,7 @@
 				101E9430290E338400F92620 /* DiscoveryOS */,
 				101E9442290E338500F92620 /* DiscoveryOSTests */,
 				101E944C290E338500F92620 /* DiscoveryOSUITests */,
+				10C6883F292CE8EF0089A94E /* discuz */,
 				101E942F290E338400F92620 /* Products */,
 				1085E8C7291CD49700CEC4B5 /* Frameworks */,
 			);
@@ -117,6 +143,7 @@
 				101E942E290E338400F92620 /* DiscoveryOS.app */,
 				101E943F290E338500F92620 /* DiscoveryOSTests.xctest */,
 				101E9449290E338500F92620 /* DiscoveryOSUITests.xctest */,
+				10C6883E292CE8EF0089A94E /* discuz */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -199,6 +226,14 @@
 			path = Extensions;
 			sourceTree = "<group>";
 		};
+		10C6883F292CE8EF0089A94E /* discuz */ = {
+			isa = PBXGroup;
+			children = (
+				10C68840292CE8EF0089A94E /* main.swift */,
+			);
+			path = discuz;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -260,6 +295,26 @@
 			productReference = 101E9449290E338500F92620 /* DiscoveryOSUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
+		10C6883D292CE8EF0089A94E /* discuz */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 10C68842292CE8EF0089A94E /* Build configuration list for PBXNativeTarget "discuz" */;
+			buildPhases = (
+				10C6883A292CE8EF0089A94E /* Sources */,
+				10C6883B292CE8EF0089A94E /* Frameworks */,
+				10C6883C292CE8EF0089A94E /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = discuz;
+			packageProductDependencies = (
+				10C68847292D0F780089A94E /* Kingfisher */,
+			);
+			productName = discuz;
+			productReference = 10C6883E292CE8EF0089A94E /* discuz */;
+			productType = "com.apple.product-type.tool";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -280,6 +335,9 @@
 					101E9448290E338500F92620 = {
 						CreatedOnToolsVersion = 14.0.1;
 						TestTargetID = 101E942D290E338400F92620;
+					};
+					10C6883D292CE8EF0089A94E = {
+						CreatedOnToolsVersion = 14.0.1;
 					};
 				};
 			};
@@ -304,6 +362,7 @@
 				101E942D290E338400F92620 /* DiscoveryOS */,
 				101E943E290E338500F92620 /* DiscoveryOSTests */,
 				101E9448290E338500F92620 /* DiscoveryOSUITests */,
+				10C6883D292CE8EF0089A94E /* discuz */,
 			);
 		};
 /* End PBXProject section */
@@ -368,6 +427,15 @@
 			files = (
 				101E944E290E338500F92620 /* DiscoveryOSUITests.swift in Sources */,
 				101E9450290E338500F92620 /* DiscoveryOSUITestsLaunchTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		10C6883A292CE8EF0089A94E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				10C68846292CF1C20089A94E /* DiscuzAPI.swift in Sources */,
+				10C68841292CE8EF0089A94E /* main.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -632,6 +700,24 @@
 			};
 			name = Release;
 		};
+		10C68843292CE8EF0089A94E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		10C68844292CE8EF0089A94E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -667,6 +753,15 @@
 			buildConfigurations = (
 				101E945A290E338500F92620 /* Debug */,
 				101E945B290E338500F92620 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		10C68842292CE8EF0089A94E /* Build configuration list for PBXNativeTarget "discuz" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				10C68843292CE8EF0089A94E /* Debug */,
+				10C68844292CE8EF0089A94E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -715,6 +810,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 104BA59A291A953F00E14756 /* XCRemoteSwiftPackageReference "KeychainAccess" */;
 			productName = KeychainAccess;
+		};
+		10C68847292D0F780089A94E /* Kingfisher */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 101E945E29109C5200F92620 /* XCRemoteSwiftPackageReference "Kingfisher" */;
+			productName = Kingfisher;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

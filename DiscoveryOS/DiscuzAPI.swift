@@ -26,7 +26,7 @@ public struct Reply : Identifiable {
 	}
 	
 	internal init(seq : Int, len : Int) {
-		assert(len > 0 && seq > 0 && len != 120)
+		assert(len > 0 && seq > 0)
 		self.init(id: "placeholder@\(seq)",
 				  author: User(id: "", name: "", avatar: ""),
 				  at: "",
@@ -122,6 +122,7 @@ extension String {
 		})
 	}
 	
+	// see https://stackoverflow.com/questions/41477013/swift-removingpercentencoding-not-work-with-a-gb2312-string
 	func urlencode(using encoding: String.Encoding = .gb_18030_2000) -> String? {
 		var res = ""
 		let src = self.replacingOccurrences(of: " ", with: "+")
@@ -148,25 +149,35 @@ extension String {
 		return re.stringByReplacingMatches(in: self, options: [], range: NSRange(0..<self.utf16.count), withTemplate: template)
 	}
 	
-	func bytesByRemovingPercentEncoding(using encoding: String.Encoding) -> Data {
-		struct My {
-			static let regex = try! NSRegularExpression(pattern: "(%[0-9A-F]{2})|(.)", options: .caseInsensitive)
-		}
-		var bytes = Data()
-		let nsSelf = self as NSString
-		for match in My.regex.matches(in: self, range: NSRange(0..<self.utf16.count)) {
-			if match.range(at: 1).location != NSNotFound {
-				let hexString = nsSelf.substring(with: NSMakeRange(match.range(at: 1).location+1, 2))
-				bytes.append(UInt8(hexString, radix: 16)!)
-			} else {
-				let singleChar = nsSelf.substring(with: match.range(at: 2))
-				bytes.append(singleChar.data(using: encoding) ?? "?".data(using: .ascii)!)
+	func captureGroups(regex: String, options: NSRegularExpression.Options = .dotMatchesLineSeparators, skipFirst: Bool = false) -> [String] {
+		
+		var results : [String] = []
+		
+		if let matches = try? NSRegularExpression(pattern: regex, options: .dotMatchesLineSeparators).matches(in: self, range: NSMakeRange(0, count)) {
+			
+			if matches.count > 1 {
+				for match in matches {
+					if let sub = Range(match.range(at: 0), in: self) {
+						results.append(String(self[sub]))
+					}
+				}
+				
+				return results
+			}
+			
+			guard let match = matches.first else {
+				return results
+			}
+			
+			let start = skipFirst ? 1 : 0
+			for i in start..<match.numberOfRanges {
+				if let sub = Range(match.range(at: i), in: self) {
+					results.append(String(self[sub]))
+				}
 			}
 		}
-		return bytes
-	}
-	func removingPercentEncoding(using encoding: String.Encoding) -> String? {
-		return String(data: bytesByRemovingPercentEncoding(using: encoding), encoding: encoding)
+		
+		return results
 	}
 }
 
@@ -174,7 +185,7 @@ var sharedFormHash : String? = nil
 
 public struct DiscuzAPI {
 	
-	let debug_loadreplies = true
+	let debug_loadreplies = false
 	let debug_markdown = false
 	let debug_misc = false
 	let debug_cookies = false
@@ -188,6 +199,8 @@ public struct DiscuzAPI {
 	var pass : String? = nil
 	
 	let session : URLSession
+	
+	var authenticated = false
 	
 	init(session: URLSession = .shared, user : String? = nil, pass : String? = nil) {
 		self.session = session
@@ -227,38 +240,6 @@ public struct DiscuzAPI {
 		}
 		
 		return result
-	}
-	
-	func capturedGroups(regex: String, text: String, options: NSRegularExpression.Options = .dotMatchesLineSeparators, skipFirst: Bool = false) -> [String] {
-		
-		var results : [String] = []
-		
-		if let matches = try? NSRegularExpression(pattern: regex, options: .dotMatchesLineSeparators).matches(in: text, range: NSMakeRange(0, text.count)) {
-			//			print("count: \(matches.count)")
-			
-			if matches.count > 1 {
-				for match in matches {
-					if let sub = Range(match.range(at: 0), in: text) {
-						results.append(String(text[sub]))
-					}
-				}
-				
-				return results
-			}
-			
-			guard let match = matches.first else {
-				return results
-			}
-			
-			let start = skipFirst ? 1 : 0
-			for i in start..<match.numberOfRanges {
-				if let sub = Range(match.range(at: i), in: text) {
-					results.append(String(text[sub]))
-				}
-			}
-		}
-		
-		return results
 	}
 	
 	func request2(method: String = "GET", url: String, args: [(String, Any)]? = nil,
@@ -306,7 +287,7 @@ public struct DiscuzAPI {
 		}
 		
 		if let text {
-			let formhash = capturedGroups(regex: #"<a href="logging.php\?action=logout&amp;formhash=([^"]+)">退出</a>"#, text: text, skipFirst: true)
+			let formhash = text.captureGroups(regex: #"<a href="logging.php\?action=logout&amp;formhash=([^"]+)">退出</a>"#, skipFirst: true)
 			if formhash.count > 0 {
 				sharedFormHash = formhash[0]
 			}
@@ -333,7 +314,11 @@ public struct DiscuzAPI {
 	
 	func request(method: String = "GET", url: String, args: [(String, Any)]? = nil, retry : Bool = true) async throws -> String? {
 		let (text, _) = try await request2(method: method, url: url, args: args, retry: retry)
-		return text
+		if let text {
+			return text.replace(pattern: "\r\n", with: "\n")
+		} else {
+			return text
+		}
 	}
 	
 	public mutating func login(name : String, pass : String) async -> Bool {
@@ -341,9 +326,12 @@ public struct DiscuzAPI {
 		if formhash != nil {
 			self.user = name
 			self.pass = pass
+			
+			self.authenticated = true
 			return true
 		}
 		
+		self.authenticated = false
 		return false
 	}
 	
@@ -356,7 +344,7 @@ public struct DiscuzAPI {
 		], retry: false)
 		
 		if let html {
-			let formhash = capturedGroups(regex: #"<a href="logging.php\?action=logout&amp;formhash=([^"]+)">退出</a>"#, text: html, skipFirst: true)
+			let formhash = html.captureGroups(regex: #"<a href="logging.php\?action=logout&amp;formhash=([^"]+)">退出</a>"#, skipFirst: true)
 			print("login \(name) \(formhash)")
 			return formhash.count > 0 ? formhash[0] : nil
 		} else {
@@ -364,10 +352,12 @@ public struct DiscuzAPI {
 		}
 	}
 	
-	public func logout() async {
+	public mutating func logout() async {
 		
 		let text = try? await request(method: "GET", url: host + "logging.php?action=logout&formhash=\(sharedFormHash ?? "")", retry: false)
 		print("logout: \(text ?? "")")
+		
+		self.authenticated = false
 		
 		let cookieStore = HTTPCookieStorage.shared
 		for cookie in cookieStore.cookies ?? [] {
@@ -386,13 +376,13 @@ public struct DiscuzAPI {
 		if let html {
 			
 //			let rows = html.components(separatedBy: "onclick=\"showWindow('reply', this.href);")
-			let rows = html.components(separatedBy: #"<td class="postcontent postbottom">"#)
+			let rows = html.components(separatedBy: #"<tr><td class="postcontent postbottom">"#)
 //			let rows = html.ranges(of:"onclick=\"showWindow('reply', this.href);", options: .regularExpression).map { String(html[$0]) }
 			
 			if rows.isEmpty {
 				print("html: \(html)")
 			}
-			print("rows:\(rows.count)")
+//			print("rows:\(rows.count)")
 			
 			for row in rows {
 //				row = [
@@ -404,7 +394,7 @@ public struct DiscuzAPI {
 //					$0.replace(pattern:$1, with: "", options: [])
 //				}
 				
-				let col = capturedGroups(regex: "<table id=\"pid(\\d+)\".*?space.php\\?uid=(\\d+).*?>([^<]+)</a>.*href=\"space.php\\?uid=.*?<img src=\"([^\"]+)\".*<em>(\\d+)</em><sup>#</sup>.*<em id=.*?>发表于 ([^<]+)</em>.*(<div class=\"postmessage.*)", text: row, skipFirst: true)
+				let col = row.captureGroups(regex: #"<table id=\"pid(\d+)\".*?space.php\?uid=(\d+).*?>([^<]+)</a>.*href=\"space.php\?uid=.*?<img src=\"([^\"]+)\".*<em>(\d+)</em><sup>#</sup>.*<em id=.*?>发表于 ([^<]+)</em>.*(<div class=\"postmessage.*)$"#, skipFirst: true)
 				
 				if col.isEmpty {
 					if debug_loadreplies {
@@ -413,6 +403,9 @@ public struct DiscuzAPI {
 				} else {
 					let user = User(id: col[1], name: col[2], avatar: col[3])
 					let body = col[6]
+//						let file = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask)[0].appendingPathComponent("row")
+//						do {try row.write(to: file, atomically: true, encoding: .utf8)} catch {print("err", error)}
+
 					let markdown = makeMarkdown(src:body)
 					let reply = Reply(id: col[0], author:user, at: col[5], seq: Int(col[4]) ?? -1, body: body, markdown: markdown)
 					replies.append(reply)
@@ -428,14 +421,12 @@ public struct DiscuzAPI {
 		var posts : [Post] = []
 		let html = try? await request(url: host + "forumdisplay.php?fid=\(fid)&page=\(page)")
 		if let html {
-			let rows = capturedGroups(regex: "<tr>.*?</tr>", text: html)
+			let rows = html.captureGroups(regex: "<tr>.*?</tr>")
 			for row in rows {
-				let col = capturedGroups(regex: "<span[^>]*><a href=\"viewthread.php\\?tid=(\\d+)[^>]*>([^<]+).*href=\"space.php\\?uid=(\\d+)\">([^<]+)</a>.*<em>(\\d{4}-\\d{1,2}-\\d{1,2})</em>.*<td class=\"nums\"><strong>(\\d+)</strong>/<em>(\\d+)</em></td>.*space.php\\?username=[^\"]+\">([^<]+)<.*lastpost\">([^<]+)<", text: row, skipFirst: true)
+				let col = row.captureGroups(regex: "<span[^>]*><a href=\"viewthread.php\\?tid=(\\d+)[^>]*>([^<]+).*href=\"space.php\\?uid=(\\d+)\">([^<]+)</a>.*<em>(\\d{4}-\\d{1,2}-\\d{1,2})</em>.*<td class=\"nums\"><strong>(\\d+)</strong>/<em>(\\d+)</em></td>.*space.php\\?username=[^\"]+\">([^<]+)<.*lastpost\">([^<]+)<", skipFirst: true)
 				if col.count > 0 {
 					let post = Post(id:col[0], title: col[1].htmlDecoded, uid:col[2], author:col[3].removingPercentEncoding ?? col[3], at: col[4], replies: Int(col[5]) ?? 0, views: Int(col[6]) ?? 0, lastReplyBy: col[7].removingPercentEncoding ?? col[7], lastReplyAt: col[8])
 					posts.append(post)
-				} else {
-					print("fields:", col)
 				}
 			}
 		}
@@ -448,12 +439,12 @@ public struct DiscuzAPI {
 		var channels : [Channel] = []
 		let html = try? await request(url: host + "index.php")
 		if let html {
-			let rows = capturedGroups(regex: "<tr>.*?</tr>", text: html)
+			let rows = html.captureGroups(regex: "<tr>.*?</tr>")
 			//			print(rows[2])
 			for row in rows {
-				let col = capturedGroups(regex: "forumdisplay.php\\?fid=(\\d+).*?>([^<]+)</a>.*?<p>((?:[^<]+)?)<", text: row, skipFirst: true)
+				let col = row.captureGroups(regex: "forumdisplay.php\\?fid=(\\d+).*?>([^<]+)</a>.*?<p>((?:[^<]+)?)<", skipFirst: true)
 				if col.count > 0 {
-					let field = capturedGroups(regex: "今日: <strong>(\\d+)", text: row, skipFirst: true)
+					let field = row.captureGroups(regex: "今日: <strong>(\\d+)", skipFirst: true)
 					let newPosts = field.count == 1 ? Int(field[0]) ?? 0 : 0
 					let channel = Channel(id: col[0], title: col[1], description: col[2], newPosts: newPosts)
 					channels.append(channel)
@@ -479,7 +470,7 @@ public struct DiscuzAPI {
 			let html = try? await request(url: host + "space.php?username=\(urlencoded)")
 			if let html {
 				// print(html)
-				let col = capturedGroups(regex: "\\(UID: (\\d+)\\).*<div class=\"avatar\"><img src=\"([^\"]+)", text: html, skipFirst: true)
+				let col = html.captureGroups(regex: "\\(UID: (\\d+)\\).*<div class=\"avatar\"><img src=\"([^\"]+)", skipFirst: true)
 				if col.count > 0 {
 					user = User(id:col[0], name: name, avatar: col[1])
 				}
@@ -505,10 +496,10 @@ public struct DiscuzAPI {
 		var bookmarks : [Post] = []
 		let html = try? await request(url: host + "my.php?item=favorites&type=thread&page=\(page)")
 		if let html {
-			let rows = capturedGroups(regex: "<tr>.*?</tr>", text: html)
+			let rows = html.captureGroups(regex: "<tr>.*?</tr>")
 			for row in rows {
 				// print(row)
-				let col = capturedGroups(regex: "<a href=\"viewthread.php\\?tid=(\\d+).*?>([^<]+)</a>.*?<a href=\"forumdisplay.php.*?>([^<]+)</a>.*?<td class=\"nums\">(\\d+)</td>.*?space.php\\?username[^>]+>([^<]+)</a>.*?lastpost\">([^<]+)</a>", text: row, skipFirst: true)
+				let col = row.captureGroups(regex: "<a href=\"viewthread.php\\?tid=(\\d+).*?>([^<]+)</a>.*?<a href=\"forumdisplay.php.*?>([^<]+)</a>.*?<td class=\"nums\">(\\d+)</td>.*?space.php\\?username[^>]+>([^<]+)</a>.*?lastpost\">([^<]+)</a>", skipFirst: true)
 				if col.count > 0 {
 					// print(col)
 					let post = Post(id:col[0], title: col[1].htmlDecoded, uid:nil, author:nil, at: nil, replies: Int(col[3]) ?? 0, views: nil, lastReplyBy: col[4].removingPercentEncoding ?? col[4], lastReplyAt: col[5])
@@ -580,7 +571,7 @@ public struct DiscuzAPI {
 			}
 			
 			// <div class="alert_info"> <p>您的请求来路不正确，无法提交。</p> </div>
-			let foo = capturedGroups(regex: #"<div class="postbox">(.*?)</div>"#, text: html)
+			let foo = html.captureGroups(regex: #"<div class="postbox">(.*?)</div>"#)
 			if !foo.isEmpty {
 				print("result: \(foo[0]) ")
 			} else {

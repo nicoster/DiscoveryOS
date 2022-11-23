@@ -80,10 +80,10 @@ struct ReplyCellView : View {
 					}
 					
 					Button {
-						print("\n\n+++++++++++++++++++++++++++++++++")
+						print("\n\nbody +++++++++++++++++++++++++++++++++ \(reply.body.count)")
 						print(reply.body)
 						
-						print("---------------------------------")
+						print("markdown --------------------------------- \(reply.markdown.count)")
 						print(reply.markdown)
 						
 					} label: {
