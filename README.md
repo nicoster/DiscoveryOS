@@ -19,7 +19,7 @@ Discuz 没有 API, 靠 regexp 硬解 HTTP resposne. 具体可以查看 `DiscuzAP
 - [ ] App 图标
 
 ## Known Issues
-最低适配 macOS 12+
+最低适配 macOS 12. macOS 13 的显示还有点问题 
 
 ## Contribute
 可以提 Issues 或者 PR
