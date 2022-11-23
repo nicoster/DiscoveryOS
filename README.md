@@ -10,7 +10,7 @@
 Discuz 没有 API, 靠 regexp 硬解 HTTP resposne. 具体可以查看 `DiscuzAPI.swift`. 
 由于不依赖服务端 API, 所以有可能打造一个通用的 Discuz 客户端. 目前还是先做好一个吧.
 
-## Where we are
+## Where We Are
 - [x] 登陆
 - [x] 回帖
 - [x] 收藏
@@ -18,9 +18,18 @@ Discuz 没有 API, 靠 regexp 硬解 HTTP resposne. 具体可以查看 `DiscuzAP
 - [ ] 文件(图片)上传
 - [ ] App 图标
 
+## Known Issues
+最低适配 macOS 12+
+
+## Contribute
+可以提 Issues 或者 PR
+
 ## Credits
 - [V2exOS](https://github.com/isaced/V2exOS) - 主要的灵感来源
 - [Kingfisher](https://github.com/onevcat/Kingfisher) - 网络图片加载和缓存
 - [KeychainAccess](https://github.com/kishikawakatsumi/KeychainAccess) - Keychain 便捷访问
 - [MarkdownUI](https://github.com/gonzalezreal/MarkdownUI) - SwiftUI Markdown 渲染
 - [RedditOS](https://github.com/Dimillian/RedditOS) - 一个 SwiftUI 写的 Reddit macOS 客户端
+
+## License
+MIT
