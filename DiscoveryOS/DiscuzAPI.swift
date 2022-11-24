@@ -209,6 +209,7 @@ public struct DiscuzAPI {
 	}
 	
 	let LineSeparator = "\u{2028}"
+	let ParagraphSeparator = "\u{2029}"
 	
 	public func makeMarkdown(src: String) -> String {
 		var result : String = src
@@ -223,7 +224,7 @@ public struct DiscuzAPI {
 			("<img\\s+[^<>]*?(?:file|src)=\"([^\"]+)\"", "\n<br/>![$2]($1)\n<img"),
 			("<img\\s+[^<>]*?(?:file|src)=\"([^\"]+)\"", "\n<br/>![$2]($1)\n<img"),
 			("<blockquote>", "```"),
-			("([^>]+发表于.*?)</blockquote>", "```<br/>\n$1")
+			("([^>]+发表于.*?)</blockquote>", "```<br/>\(ParagraphSeparator)$1")
 		].reduce(result) {
 			$0.replace(pattern: $1.0, with: $1.1)
 		}
@@ -368,11 +369,19 @@ public struct DiscuzAPI {
 		}
 	}
 	
-	public func loadReplies(tid: String, page: Int = 1) async -> [Reply] {
+	/// - Parameters:
+	///   - tid: the thread id
+	///   - page: which page to load
+	///   - pid: the reply id, if this param is present, `page` is ignored
+	///
+	/// - Returns: an array of ``Reply``, might be empty
+	public func loadReplies(tid: String, page: Int = 1, pid: String? = nil) async -> [Reply] {
 		print("start load post \(tid) page \(page)")
 		var replies : [Reply] = []
 		
-		let html = try? await request(url: host + "viewthread.php?tid=\(tid)&page=\(page)")
+		let html = try? await request(url: pid != nil
+									  ? host + "redirect.php?goto=findpost&ptid=\(tid)&pid=\(pid!)"
+									  : host + "viewthread.php?tid=\(tid)&page=\(page)")
 		if let html {
 			
 //			let rows = html.components(separatedBy: "onclick=\"showWindow('reply', this.href);")

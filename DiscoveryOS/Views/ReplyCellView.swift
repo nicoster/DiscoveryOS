@@ -29,12 +29,46 @@ struct WebView : NSViewRepresentable {
 
 #endif
 
+struct HilightedReply : View {
+	internal init(tid: String, pid: Binding<String>) {
+		print("init popover \(pid)")
+		self.tid = tid
+		self._pid = pid
+	}
+	
+	let tid : String
+	@Binding var pid : String
+	
+	@State var loaded = false
+	@State var reply : Reply?
+	
+	var body : some View {
+		if loaded, let reply {
+			Markdown(reply.markdown, baseURL: URL(string:discuz.host)!)
+		} else {
+			ProgressView()
+				.onAppear {
+					Task {
+						let replies = await discuz.loadReplies(tid: tid, pid: pid)
+						if let reply = replies.first(where:{$0.id == pid}) {
+							print("hilighted: \(reply)")
+							self.reply = reply
+							loaded = true
+						}
+					}
+				}
+		}
+	}
+}
+
 struct ReplyCellView : View {
 	let channel : Channel
 	let reply : Reply
 	let post : Post
 	let first : Bool
-//	@State private var showingPopover = false
+	@State private var showingPopover = false
+	@State private var hilightedPid : String = ""
+	
 	@State var bookmarked = false
 	
 	@Binding var showingReplyPanel : Bool
@@ -126,7 +160,27 @@ struct ReplyCellView : View {
 					.markdownStyle(
 						MarkdownStyle(font: .system(size: 14))
 					)
-				
+					.environment(
+						\.openURL,
+						 OpenURLAction { url in
+							 print("url:\(url.absoluteString)")
+							 // https://www.4d4y.com/forum/redirect.php?goto=findpost&pid=66065118&ptid=3114920
+							 let fields = url.absoluteString.captureGroups(regex: #"findpost.*pid=(\d+)"#, skipFirst: true)
+							 if fields.count > 0 {
+								 let pid = fields[0]
+								 hilightedPid = pid
+								 showingPopover = true
+								 return .handled
+							 } else {
+								 return .systemAction
+							 }
+						 }
+					)
+					.popover(isPresented: $showingPopover) {
+						HilightedReply(tid:post.id, pid: $hilightedPid)
+							.frame(minWidth: 400)
+							.padding(8)
+					}
 			}
 		}
 	}
