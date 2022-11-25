@@ -25,9 +25,9 @@ public struct Reply : Identifiable {
 		self.markdown = markdown
 	}
 	
-	internal init(seq : Int, len : Int) {
+	static func placeholder(seq : Int, len : Int) -> Reply {
 		assert(len > 0 && seq > 0)
-		self.init(id: "placeholder@\(seq)",
+		return Reply(id: "placeholder@\(seq)",
 				  author: User(id: "", name: "", avatar: ""),
 				  at: "",
 				  seq: seq,
@@ -37,16 +37,14 @@ public struct Reply : Identifiable {
 		)
 	}
 	
-	internal init() {
-		self.init(id: "spinner",
-				  author: User(id: "", name: "", avatar: ""),
-				  at: "",
-				  seq: Int.max,
-				  len: 0,
-				  body: "",
-				  markdown: ""
-		)
-	}
+	static let spinner = Reply(id: "spinner",
+							   author: User(id: "", name: "", avatar: ""),
+					  at: "",
+					  seq: Int.max,
+					  len: 0,
+					  body: "",
+					  markdown: ""
+			)
 	
 	var isSpinner : Bool { id == "spinner" }
 	
@@ -76,6 +74,12 @@ public struct Post : Identifiable {
 	public let views: Int?
 	public let lastReplyBy: String?
 	public let lastReplyAt: String?
+	
+	static let separator = Post(id: "separator", title: "", uid: nil, author: nil, at: nil, replies: 0, views: nil, lastReplyBy: nil, lastReplyAt: nil)
+	
+	public var isSeparator : Bool {
+		id == "separator"
+	}
 	
 	var link : String {
 		discuz.host + "viewthread.php?tid=\(id)"

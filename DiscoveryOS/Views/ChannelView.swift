@@ -25,7 +25,11 @@ struct ChannelView: View {
 				List {
 					if let posts {
 						ForEach (posts) { post in
-							PostListCellView(post:post, channel:channel)
+							if post.isSeparator {
+								Divider()
+							} else {
+								PostListCellView(post:post, channel:channel)
+							}
 						}
 					}
 					
@@ -85,6 +89,25 @@ struct ChannelView: View {
 		firstLoaded = true
 	}
 	
+	func insertSeparator(posts : inout [Post]){
+		var pos : Int?
+		var min : Date = Date()
+		for (i, post) in posts.enumerated() {
+			if let date = post.lastReplyAt?.toDate(){
+				if date < min {
+					min = date
+				} else {
+					pos = i
+					break
+				}
+			}
+		}
+		
+		if let pos {
+			posts.insert(.separator, at: pos)
+		}
+	}
+	
 	func loadMorePosts() async {
 		page += 1
 		let more : [Post]
@@ -96,6 +119,7 @@ struct ChannelView: View {
 		
 		if posts == nil {
 			posts = more
+			insertSeparator(posts: &posts!)
 			return
 		}
 		

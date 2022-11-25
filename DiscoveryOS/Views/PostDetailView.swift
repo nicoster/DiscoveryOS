@@ -243,8 +243,6 @@ struct PostDetailView : View {
 
 	}
 	
-	typealias Spinner = Reply
-	
 	func updateReplySlot(page: Int) {
 		if let pos = findReplySlot(page: page) {
 			let old = replies.remove(at:pos)
@@ -255,17 +253,17 @@ struct PostDetailView : View {
 			switch (page - old.seq / pageSize) {
 			case maxPage:
 				if maxPage == 1 {
-					new = [Spinner()]
+					new = [.spinner]
 				} else {
-					new = [Reply(seq: old.seq, len: old.len - pageSize), Spinner()]
+					new = [.placeholder(seq: old.seq, len: old.len - pageSize), .spinner]
 				}
 			case 1:
-				new = [Spinner(), Reply(seq: old.seq + pageSize, len: old.len - pageSize)]
+				new = [.spinner, .placeholder(seq: old.seq + pageSize, len: old.len - pageSize)]
 			case let slot:
 				new = [
-					Reply(seq: old.seq, len: (slot - 1) * pageSize),
-					Spinner(),
-					Reply(seq: old.seq + slot * pageSize, len: (maxPage - slot) * pageSize)
+					.placeholder(seq: old.seq, len: (slot - 1) * pageSize),
+					.spinner,
+					.placeholder(seq: old.seq + slot * pageSize, len: (maxPage - slot) * pageSize)
 				]
 			}
 			
@@ -336,7 +334,7 @@ struct PostDetailView : View {
 //				print("first:\(first)")
 				if first.seq > seq {
 					replies.insert(
-						Reply(seq: seq, len: first.seq - seq),
+						.placeholder(seq: seq, len: first.seq - seq),
 						at: pos
 					)
 					pos += 1
