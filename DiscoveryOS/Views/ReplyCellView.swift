@@ -165,6 +165,7 @@ struct ReplyCellView : View {
 						 OpenURLAction { url in
 							 print("url:\(url.absoluteString)")
 							 // https://www.4d4y.com/forum/redirect.php?goto=findpost&pid=66065118&ptid=3114920
+							 //FIXME: move `findpost` keyword to DiscuzAPI.swift?
 							 let fields = url.absoluteString.captureGroups(regex: #"findpost.*pid=(\d+)"#, skipFirst: true)
 							 if fields.count > 0 {
 								 let pid = fields[0]

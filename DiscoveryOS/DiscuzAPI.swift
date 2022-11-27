@@ -107,15 +107,7 @@ extension String {
 		return decoded ?? self
 	}
 	
-//	func urlencode() -> String? {
-//		let unreserved = "-._~/?"
-//		let allowed = NSMutableCharacterSet.alphanumeric()
-//		allowed.addCharacters(in: unreserved)
-//		return addingPercentEncoding(withAllowedCharacters: allowed as CharacterSet)
-//
-//	}
-	
-	func htmlEntities() -> String {
+	var htmlEntities : String {
 		String(flatMap {
 			if let value = $0.unicodeScalars.first?.value,
 			   (value > 127 && value < 0x3000) || value > 0x9fff {
@@ -227,8 +219,7 @@ public struct DiscuzAPI {
 			// 2 passes to handle 1 image with both `src` and `file` attributes
 			("<img\\s+[^<>]*?(?:file|src)=\"([^\"]+)\"", "\n<br/>![$2]($1)\n<img"),
 			("<img\\s+[^<>]*?(?:file|src)=\"([^\"]+)\"", "\n<br/>![$2]($1)\n<img"),
-			("<blockquote>", "```"),
-			("([^>]+发表于.*?)</blockquote>", "```<br/>\(ParagraphSeparator)$1")
+			("<blockquote>(.*>)([^>]+发表于.*?)</blockquote>", "$2```\(LineSeparator)$1```")
 		].reduce(result) {
 			$0.replace(pattern: $1.0, with: $1.1)
 		}
@@ -247,7 +238,7 @@ public struct DiscuzAPI {
 		return result
 	}
 	
-	func request2(method: String = "GET", url: String, args: [(String, Any)]? = nil,
+	func dorequest(method: String = "GET", url: String, args: [(String, Any)]? = nil,
 				  moreheaders: [String: String]? = nil, retry : Bool = true) async throws -> (text: String?, resp: URLResponse?) {
 		let urlComponents = NSURLComponents(string: url)!
 		
@@ -311,14 +302,14 @@ public struct DiscuzAPI {
 		if retry, let text, text.contains(loginRequired), let user, let pass {
 			print("re-login for \(url)")
 			let _ = await dologin(name:user, pass:pass)
-			return try await self.request2(method: method, url: url, args:args, retry:false)
+			return try await self.dorequest(method: method, url: url, args:args, retry:false)
 		}
 		return (text, resp)
 		
 	}
 	
 	func request(method: String = "GET", url: String, args: [(String, Any)]? = nil, retry : Bool = true) async throws -> String? {
-		let (text, _) = try await request2(method: method, url: url, args: args, retry: retry)
+		let (text, _) = try await dorequest(method: method, url: url, args: args, retry: retry)
 		if let text {
 			return text.replace(pattern: "\r\n", with: "\n")
 		} else {
@@ -389,7 +380,7 @@ public struct DiscuzAPI {
 		if let html {
 			
 //			let rows = html.components(separatedBy: "onclick=\"showWindow('reply', this.href);")
-			let rows = html.components(separatedBy: #"<tr><td class="postcontent postbottom">"#)
+			let rows = html.components(separatedBy: #"<td class="postcontent postbottom">"#)
 //			let rows = html.ranges(of:"onclick=\"showWindow('reply', this.href);", options: .regularExpression).map { String(html[$0]) }
 			
 			if rows.isEmpty {
@@ -558,11 +549,11 @@ public struct DiscuzAPI {
 //			print("Cookie inserted: \(cookie)")
 		}
 		
-		let normalized = content.replacingOccurrences(of: "\n", with: "\r\n").htmlEntities().urlencode()!
+		let normalized = content.replacingOccurrences(of: "\n", with: "\r\n").htmlEntities.urlencode()!
 		if debug_encoding {
 			print("normalized:\(normalized)")
 		}
-		let result = try? await request2(method: "POST",
+		let result = try? await dorequest(method: "POST",
 										 url: host + "post.php?action=reply&fid=\(fid)&tid=\(tid)&extra=page%3D1&replysubmit=yes&infloat=yes&handlekey=fastpost&inajax=1",
 										 args: [
 											("formhash", sharedFormHash!),
