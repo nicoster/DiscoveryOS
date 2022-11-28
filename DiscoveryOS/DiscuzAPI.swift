@@ -175,41 +175,11 @@ extension String {
 		
 		return results
 	}
-}
+	
+	var markdown : String {
+		var result : String = self
+		let LineSeparator = "\u{2028}"
 
-var sharedFormHash : String? = nil
-
-public struct DiscuzAPI {
-	
-	let debug_loadreplies = false
-	let debug_markdown = false
-	let debug_misc = false
-	let debug_cookies = false
-	let debug_traffic = false
-	let debug_encoding = false
-	
-	let host = "https://www.4d4y.com/forum/"
-	let loginRequired = "<select name=\"loginfield\" id=\"loginfield\">"
-	let pageSize = 15
-	var user : String? = nil
-	var pass : String? = nil
-	
-	let session : URLSession
-	
-	var authenticated = false
-	
-	init(session: URLSession = .shared, user : String? = nil, pass : String? = nil) {
-		self.session = session
-		self.user = user
-		self.pass = pass
-	}
-	
-	let LineSeparator = "\u{2028}"
-	let ParagraphSeparator = "\u{2029}"
-	
-	public func makeMarkdown(src: String) -> String {
-		var result : String = src
-		
 		// relative paths are handled by MarkdownUI (using baseURL)
 		
 		result = [
@@ -224,9 +194,9 @@ public struct DiscuzAPI {
 			$0.replace(pattern: $1.0, with: $1.1)
 		}
 		
-		if debug_markdown {
-			print("result:\(result)")
-		}
+//		if debug_markdown {
+//			print("result:\(result)")
+//		}
 		
 		if let attributed = try? NSAttributedString(data: result.data(using: .unicode)!, options: [.documentType: NSAttributedString.DocumentType.html], documentAttributes: nil) {
 			result = attributed.string.replace(pattern: "\\[\\s*\n", with: "[")
@@ -237,6 +207,36 @@ public struct DiscuzAPI {
 		
 		return result
 	}
+}
+
+var sharedFormHash : String? = nil
+
+public struct DiscuzAPI {
+	
+	let debug_loadreplies = false
+//	let debug_markdown = false
+	let debug_misc = false
+	let debug_cookies = false
+	let debug_traffic = false
+	let debug_encoding = false
+	
+	let host = "https://www.4d4y.com/forum/"
+	let loginRequired = "<select name=\"loginfield\" id=\"loginfield\">"
+	var pageSize = 50
+	var user : String? = nil
+	var pass : String? = nil
+	
+	let session : URLSession
+	
+	var authenticated = false
+	
+	init(session: URLSession = .shared, user : String? = nil, pass : String? = nil) {
+		self.session = session
+		self.user = user
+		self.pass = pass
+	}
+	
+	let LineSeparator = "\u{2028}"
 	
 	func dorequest(method: String = "GET", url: String, args: [(String, Any)]? = nil,
 				  moreheaders: [String: String]? = nil, retry : Bool = true) async throws -> (text: String?, resp: URLResponse?) {
@@ -324,11 +324,25 @@ public struct DiscuzAPI {
 			self.pass = pass
 			
 			self.authenticated = true
+			
+			await loadConfig()
 			return true
 		}
 		
 		self.authenticated = false
 		return false
+	}
+	
+	private mutating func loadConfig() async {
+		let html = try? await request(method: "GET", url: host + "memcp.php?action=profile&typeid=5")
+		if let html {
+			let psize = html.captureGroups(regex: #"name="pppnew" value="(\d+)" checked="checked""#, skipFirst: true)
+			if psize.count > 0,
+			   let pageSize = Int(psize[0]),
+			   pageSize > 0 {
+				self.pageSize = pageSize
+			}
+		}
 	}
 	
 	private func dologin(name : String, pass : String) async -> String? {
@@ -342,6 +356,8 @@ public struct DiscuzAPI {
 		if let html {
 			let formhash = html.captureGroups(regex: #"<a href="logging.php\?action=logout&amp;formhash=([^"]+)">退出</a>"#, skipFirst: true)
 			print("login \(name) \(formhash)")
+			
+			
 			return formhash.count > 0 ? formhash[0] : nil
 		} else {
 			return nil
@@ -410,8 +426,7 @@ public struct DiscuzAPI {
 //						let file = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask)[0].appendingPathComponent("row")
 //						do {try row.write(to: file, atomically: true, encoding: .utf8)} catch {print("err", error)}
 
-					let markdown = makeMarkdown(src:body)
-					let reply = Reply(id: col[0], author:user, at: col[5], seq: Int(col[4]) ?? -1, body: body, markdown: markdown)
+					let reply = Reply(id: col[0], author:user, at: col[5], seq: Int(col[4]) ?? -1, body: body, markdown: body.markdown)
 					replies.append(reply)
 				}
 			}
