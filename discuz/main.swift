@@ -8,7 +8,7 @@
 import Foundation
 import Kingfisher
 
-var discuz = DiscuzAPI()
+var discuz = DiscuzAPI.shared
 let user = "", pass = ""
 
 func main() async {

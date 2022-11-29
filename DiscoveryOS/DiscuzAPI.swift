@@ -13,8 +13,11 @@ public struct User : Identifiable {
 	public let avatar: String
 }
 
-public struct Reply : Identifiable {
-
+public struct Reply : Identifiable, Equatable {
+	public static func == (lhs: Reply, rhs: Reply) -> Bool {
+		lhs.id == rhs.id
+	}
+	
 	internal init(id: String, author: User, at: String, seq: Int, len: Int = 1, body: String, markdown: String) {
 		self.id = id
 		self.author = author
@@ -50,9 +53,9 @@ public struct Reply : Identifiable {
 	
 	var isPlaceholder : Bool { len > 1 }
 	var pageSlots: String {
-		//FIXME: the correct way to reference `DiscuzAPI`?
-		"折叠了 \(len) 个回帖" + discuz.LineSeparator +
-		Array((seq / discuz.pageSize + 1)..<((seq + len + discuz.pageSize) / discuz.pageSize)).map {"[\($0)](page:\($0))"}.joined(separator: " | ")
+		let pageSize = DiscuzAPI.shared.pageSize
+		return "折叠了 \(len) 个回帖" + DiscuzAPI.shared.LineSeparator +
+		Array((seq / pageSize + 1)..<((seq + len + pageSize) / pageSize)).map {"[\($0)](page:\($0))"}.joined(separator: " | ")
 	}
 	
 	public let id: String
@@ -82,7 +85,7 @@ public struct Post : Identifiable {
 	}
 	
 	var link : String {
-		discuz.host + "viewthread.php?tid=\(id)"
+		DiscuzAPI.shared.host + "viewthread.php?tid=\(id)"
 	}
 }
 
@@ -212,6 +215,8 @@ extension String {
 var sharedFormHash : String? = nil
 
 public struct DiscuzAPI {
+	
+	static let shared = DiscuzAPI()
 	
 	let debug_loadreplies = false
 //	let debug_markdown = false

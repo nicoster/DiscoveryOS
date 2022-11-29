@@ -8,7 +8,7 @@
 import SwiftUI
 import Kingfisher
 
-var discuz = DiscuzAPI()
+var discuz = DiscuzAPI.shared
 
 @main
 struct DiscoveryOSApp: App {

@@ -172,7 +172,7 @@ final class DiscoveryOSTests: XCTestCase {
 		}
 		
 		MockURLProtocol.requestHandler = { request in
-			return (HTTPURLResponse(), mockData.data(using: self.discuz.GB_18030_2000)!)
+			return (HTTPURLResponse(), mockData.data(using: .gb_18030_2000)!)
 		}
 		let channels = await discuz.loadChannels()
 		print("channels: \(channels)")
@@ -3887,7 +3887,7 @@ GMT+8, 2022-11-1 15:58.
 """
 		}
 		MockURLProtocol.requestHandler = { request in
-			return (HTTPURLResponse(), mockData.data(using: self.discuz.GB_18030_2000)!)
+			return (HTTPURLResponse(), mockData.data(using: .gb_18030_2000)!)
 		}
 		let replies = await discuz.loadReplies(tid: "1", page: 1)
 		print("replies: \(replies)")
@@ -4294,7 +4294,7 @@ GMT+8, 2022-11-1 15:58.
 		}
 		
 		MockURLProtocol.requestHandler = { request in
-			return (HTTPURLResponse(), mockData.data(using: self.discuz.GB_18030_2000)!)
+			return (HTTPURLResponse(), mockData.data(using: .gb_18030_2000)!)
 		}
 		let replies = await discuz.loadReplies(tid: "1", page: 1)
 		print("replies: \(replies)")

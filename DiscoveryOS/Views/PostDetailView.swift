@@ -104,10 +104,9 @@ struct PostDetailView : View {
 	let channel : Channel
 	let pageSize = discuz.pageSize
 	
-	@State var mainPost: Reply?
 	@State var replies : [Reply] = []
-	@State var mainPageLoaded : Bool = false
-	@State var lastPage : Int = -1
+	@State var lastPage : Int = -1	// the last page
+	@State var tailPage : Int = 1 	// current last page
 	@State var page : Int = 1
 	
 	@State var showingPanel = false
@@ -117,7 +116,11 @@ struct PostDetailView : View {
 	
 	@State var bookmarked = false
 	
-	@State var loading : Bool = false
+	@State var loading : Bool = false {
+		willSet {
+			print("will set loading:\(newValue) last: \(lastPage)")
+		}
+	}
 	
 	func hasMoreReplies() -> Bool {
 		lastPage < 0 && replies.count > 0
@@ -126,8 +129,7 @@ struct PostDetailView : View {
 	var body: some View {
 		List {
 			
-			if mainPageLoaded, let mainPost {
-				ReplyCellView(showingReplyPanel: $showingPanel, replyContent: $replyContent, channel: channel, reply: mainPost, post: postInfo, first: true)
+			if !replies.isEmpty {
 				
 				ForEach (replies) { reply in
 					if reply.isPlaceholder {
@@ -153,7 +155,7 @@ struct PostDetailView : View {
 						ProgressView()
 							.alignmentGuide(HorizontalAlignment.center) { _ in 0}
 					} else {
-						ReplyCellView(showingReplyPanel: $showingPanel, replyContent: $replyContent, channel: channel, reply: reply, post: postInfo)
+						ReplyCellView(showingReplyPanel: $showingPanel, replyContent: $replyContent, channel: channel, reply: reply, post: postInfo, first: reply == replies.first)
 					}
 				}
 			} else {
@@ -175,7 +177,7 @@ struct PostDetailView : View {
 							if replies.count <= pageSize && total - page > 8 {
 								loadMoreReplies(page: page + total - 5)
 							} else {
-								loadMoreReplies(page: page + 1)
+								loadMoreReplies(page: tailPage + 1)
 							}
 						}
 					Spacer()
@@ -187,16 +189,13 @@ struct PostDetailView : View {
 		.foregroundColor(Color(NSColor.labelColor))
 #endif
 		.task {
-			if !mainPageLoaded {
+			if replies.isEmpty {
 				let replies = await discuz.loadReplies(tid: postInfo.id)
-				mainPost = replies.first
-				if replies.count < pageSize - 3 {
+				if replies.count < pageSize {
 					lastPage = 1
 				}
 				
-				self.replies = Array(replies.dropFirst())
-				
-				mainPageLoaded = true
+				self.replies = replies
 			}
 		}
 		.toolbar {
@@ -291,12 +290,16 @@ struct PostDetailView : View {
 
 	func loadMoreReplies(page : Int) {
 		if loading {
+			print("is loading \(self.page), ignore load \(page)")
 			return
 		}
 		
 		loading = true
 		
 		Task {
+			defer {
+				loading = false
+			}
 			
 			if lastPage > 0 && lastPage <= page {
 				print("loaded too many page \(page) last: \(lastPage)")
@@ -304,16 +307,21 @@ struct PostDetailView : View {
 			}
 			
 			self.page = page
+			if page > self.tailPage {
+				self.tailPage = page
+			}
 			
 			let more = await discuz.loadReplies(tid: postInfo.id, page: page)
 			
-			// if replies are already loaded, it means EOF
-			for item in more {
-				if replies.first(where:{$0.id == item.id}) != nil {
-					print("\(item.seq)# already exists, stop loading")
-					lastPage = page
-					loading = false
-					return
+			if more.count < pageSize {
+				lastPage = page
+			} else {
+				for item in more { // if replies are already loaded, it means EOF
+					if replies.first(where:{$0.id == item.id}) != nil {
+						print("\(item.seq)# already exists, stop loading")
+						lastPage = page
+						return
+					}
 				}
 			}
 			
@@ -346,7 +354,6 @@ struct PostDetailView : View {
 			}
 			
 //			print("count \(replies.count)")
-			loading = false
 			
 //			replies.forEach { print("\($0.seq), \($0.len)") }
 		}
