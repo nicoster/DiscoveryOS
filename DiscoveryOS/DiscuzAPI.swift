@@ -29,6 +29,7 @@ public struct Reply : Identifiable, Equatable {
 	}
 	
 	static func placeholder(seq : Int, len : Int) -> Reply {
+		print("placeholder seq:\(seq) len:\(len)")
 		assert(len > 0 && seq > 0)
 		return Reply(id: "placeholder@\(seq)",
 				  author: User(id: "", name: "", avatar: ""),
@@ -54,8 +55,10 @@ public struct Reply : Identifiable, Equatable {
 	var isPlaceholder : Bool { len > 1 }
 	var pageSlots: String {
 		let pageSize = DiscuzAPI.shared.pageSize
-		return "折叠了 \(len) 个回帖" + DiscuzAPI.shared.LineSeparator +
+		let res = "折叠了 \(len) 个回帖 \(DiscuzAPI.shared.LineSeparator)" +
 		Array((seq / pageSize + 1)..<((seq + len + pageSize) / pageSize)).map {"[\($0)](page:\($0))"}.joined(separator: " | ")
+		print("page slots:\(res)")
+		return res
 	}
 	
 	public let id: String
@@ -214,7 +217,9 @@ extension String {
 
 var sharedFormHash : String? = nil
 
-public struct DiscuzAPI {
+// a singleton has to be a class (instead of struct)
+// see https://stackoverflow.com/a/36788519/590307
+public class DiscuzAPI {
 	
 	static let shared = DiscuzAPI()
 	
@@ -322,7 +327,7 @@ public struct DiscuzAPI {
 		}
 	}
 	
-	public mutating func login(name : String, pass : String) async -> Bool {
+	public func login(name : String, pass : String) async -> Bool {
 		let formhash = await dologin(name: name, pass: pass)
 		if formhash != nil {
 			self.user = name
@@ -338,7 +343,7 @@ public struct DiscuzAPI {
 		return false
 	}
 	
-	private mutating func loadConfig() async {
+	private func loadConfig() async {
 		let html = try? await request(method: "GET", url: host + "memcp.php?action=profile&typeid=5")
 		if let html {
 			let psize = html.captureGroups(regex: #"name="pppnew" value="(\d+)" checked="checked""#, skipFirst: true)
@@ -369,7 +374,7 @@ public struct DiscuzAPI {
 		}
 	}
 	
-	public mutating func logout() async {
+	public func logout() async {
 		
 		let text = try? await request(method: "GET", url: host + "logging.php?action=logout&formhash=\(sharedFormHash ?? "")", retry: false)
 		print("logout: \(text ?? "")")
