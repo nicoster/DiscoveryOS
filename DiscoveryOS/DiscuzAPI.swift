@@ -124,6 +124,8 @@ extension String {
 		})
 	}
 	
+	
+	
 	// see https://stackoverflow.com/questions/41477013/swift-removingpercentencoding-not-work-with-a-gb2312-string
 	func urlencode(using encoding: String.Encoding = .gb_18030_2000) -> String? {
 		var res = ""

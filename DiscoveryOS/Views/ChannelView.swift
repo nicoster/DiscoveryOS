@@ -47,7 +47,7 @@ struct ChannelView: View {
 				.listStyle(.inset)
 				.frame(minWidth: 400, idealWidth: 500)
 			} else {
-				ProgressView().frame(minWidth: 400)
+				ProgressView().frame(minWidth: 300)
 			}
 			
 		}
@@ -119,7 +119,9 @@ struct ChannelView: View {
 		
 		if posts == nil {
 			posts = more
+			#if os(macOS)
 			insertSeparator(posts: &posts!)
+			#endif
 			return
 		}
 		

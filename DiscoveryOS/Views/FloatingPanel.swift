@@ -6,6 +6,7 @@
 
 import SwiftUI
 
+#if os(macOS)
 /// An NSPanel subclass that implements floating panel traits.
 class FloatingPanel<Content: View>: NSPanel {
 	@Binding var isPresented: Bool
@@ -288,3 +289,5 @@ public struct FloatingPanelExpandableLayout<Toolbar: View, Sidebar: View, Conten
 		return width >= totalWidth
 	}
 }
+
+#endif

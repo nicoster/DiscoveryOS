@@ -85,9 +85,11 @@ struct ReplyCellView : View {
 	}
 	
 	var body : some View {
+		#if os(macOS)
 		if !first {
 			Divider()
 		}
+		#endif
 		
 		HStack(alignment: .top) {
 			
@@ -103,6 +105,13 @@ struct ReplyCellView : View {
 				HStack {
 					if let username = reply.author.name {
 						Text(username)
+						if username == post.author {
+							Text("楼主")
+								.font(.system(size:11))
+								.foregroundColor(.white)
+								.padding(EdgeInsets(top: 0, leading: 2, bottom: 0, trailing: 2))
+								.background(RoundedRectangle(cornerRadius: 4).fill(.primary))
+						}
 					}
 					
 					if let created = reply.at {

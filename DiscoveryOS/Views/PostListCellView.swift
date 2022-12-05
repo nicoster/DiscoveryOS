@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Kingfisher
+import MarkdownUI
 
 struct PostListCellView : View {
 	let post : Post

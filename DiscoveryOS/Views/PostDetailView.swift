@@ -18,14 +18,16 @@ struct PostDraft : Codable {
 struct DraftView : View {
 	@Binding var content : String
 	@Binding var showingPanel : Bool
+	@Binding var lastPage : Int
 	
 	let channel : Channel
 	let postInfo : Post
 	
 	// see https://stackoverflow.com/a/56975728/590307
-	init(content: Binding<String>, showingPanel: Binding<Bool>, channel: Channel, postInfo: Post, quote: Reply?) {
+	init(content: Binding<String>, showingPanel: Binding<Bool>, lastPage: Binding<Int>, channel: Channel, postInfo: Post, quote: Reply?) {
 		self._content = content
 		self._showingPanel = showingPanel
+		self._lastPage = lastPage
 		self.channel = channel
 		self.postInfo = postInfo
 		
@@ -51,6 +53,7 @@ struct DraftView : View {
 							if okay {
 								content = ""
 								showingPanel = false
+								lastPage = -1
 							}
 						}
 					} label: {
@@ -199,19 +202,18 @@ struct PostDetailView : View {
 			}
 		}
 		.toolbar {
-			ToolbarItem(placement: .principal) {
+			ToolbarItemGroup(placement: .principal) {
 				if let title = postInfo.title {
 					Text(title)
 						.font(.title)
 				}
-			}
-			
-			ToolbarItemGroup {
 				
 				Link(destination: URL(string: postInfo.link)!) {
 					Image(systemName: "safari")
 				}
+				#if os(macOS)
 				.foregroundColor(Color(NSColor.secondaryLabelColor))
+				#endif
 				
 				Button {
 					Task {
@@ -222,6 +224,7 @@ struct PostDetailView : View {
 				}
 				.buttonStyle(.borderless)
 				
+				#if os(macOS)
 				Button {
 					showingPanel.toggle()
 				} label: {
@@ -233,10 +236,12 @@ struct PostDetailView : View {
 				.floatingPanel(isPresented: $showingPanel, content: {
 					DraftView(content: $replyContent,
 							  showingPanel: $showingPanel,
+							  lastPage: $lastPage,
 							  channel: channel,
 							  postInfo: postInfo,
 							  quote: nil)
 				})
+				#endif
 			}
 		}
 
