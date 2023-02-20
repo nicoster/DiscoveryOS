@@ -18,7 +18,7 @@ struct PostListCellView : View {
 	var body : some View {
 		NavigationLink {
 			PostDetailView(postInfo: post, channel: channel)
-//				.navigationTitle("\(channel) - \(post.title)")
+			//				.navigationTitle("\(channel) - \(post.title)")
 		} label: {
 			HStack {
 				if let avatar = user?.avatar {
@@ -29,26 +29,51 @@ struct PostListCellView : View {
 						.frame(width: 48, height: 48)
 						.mask(RoundedRectangle(cornerRadius: 8))
 				}
-				
 				VStack(alignment: .leading, spacing: 6) {
-					
 					Text(post.title)
 						.lineLimit(2)
-					
-					HStack() {
-						
+
+					HStack(spacing: 4) {
 						if let username = post.lastReplyBy ?? post.author {
 							Text(username)
+								.lineLimit(1)
+								.truncationMode(.tail)
 							Text("•")
 						}
-						
+
 						if let lastModified = post.lastReplyAt ?? post.at {
 							Text(lastModified.toDate()?.fromNow() ?? lastModified)
+								.lineLimit(1)
+								.truncationMode(.tail)
+						}
+
+						Spacer()
+
+						if let author = post.author, let at = post.at {
+							Group {
+								Text(author)
+									.lineLimit(1)
+									.truncationMode(.tail)
+									.font(.system(size: 11))
+									.foregroundColor(.white)
+									.padding(EdgeInsets(top: 0, leading: 2, bottom: 0, trailing: 2))
+									.background(RoundedRectangle(cornerRadius: 4).fill(.primary))
+
+								if let datestr = at.formatDate() {
+									Text(datestr)
+										.lineLimit(1)
+										.truncationMode(.tail)
+										.font(.system(size: 11))
+										.foregroundColor(.white)
+										.padding(EdgeInsets(top: 0, leading: 2, bottom: 0, trailing: 2))
+										.background(RoundedRectangle(cornerRadius: 4).fill(.primary))
+								}
+							}
 						}
 					}
-					.foregroundColor(.gray)
+					.foregroundColor(Color(NSColor.tertiaryLabelColor))
 				}
-				
+
 				
 				//				Spacer()
 				//				Text(String(post.replies))
